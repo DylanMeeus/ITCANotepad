@@ -9,8 +9,8 @@
 class ApiDatabase {
 
     private $servername = "it-ca.net";
-    private $username = "itca_insanity";
-    private $password = "Proton16021";
+    private $username = "itca_global";
+    private $password = "xgkzl9Af!pLv";
     private $con;
 
 
