@@ -43,9 +43,11 @@ class OnlineDB implements IDatabase
     public function login($username, $password)
     {
         $this->openConnection();
-        $sql = "select users.id as userid, username, apikeys.apikey from users left join apikeys on users.apikey = apikeys.id where username='" . $username . "' and password='" . $password . "'";
+        $sql = "select users.id as userid, username, apikeys.apikey from users left join apikeys on users.apikey = apikeys.id where username= ? and password  =?";
 
         $statement = $this->con->prepare($sql);
+        $statement->bindParam(1,$username);
+        $statement->bindParam(2,$password);
         $statement->execute();
         $statement->setFetchMode(PDO::FETCH_ASSOC);
         $result = $statement->fetchAll();
