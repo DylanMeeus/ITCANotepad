@@ -61,7 +61,7 @@ class OnlineDB implements IDatabase
                 $user->setAPIKey($row['apikey']);
             }
             $this->closeConnection();
-            return $user; // short-circuit it here // HOLY FUCK I HAD CONNECTIONS OPEN ALL THIS TIME. WHAT THE SHIT DUDE.
+            return $user;
         }
         $this->closeConnection();
         return null; // otherwise, null!
