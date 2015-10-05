@@ -1,11 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: Dylan
- * Date: 4/08/2015
- * Time: 4:37
- */
 
 require_once "php/db/IDatabase.php";
 require_once "php/core/User.php";

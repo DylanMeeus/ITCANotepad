@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Dylan
- * Date: 18/08/2015
- * Time: 1:56
- */
 
 
 // restfull service.

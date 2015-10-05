@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Dylan
- * Date: 4/08/2015
- * Time: 2:36
- */
 
 require_once "php/db/OnlineDB.php";
 require_once "php/db/IDatabase.php";

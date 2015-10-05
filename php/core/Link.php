@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Dylan
- * Date: 11/08/2015
- * Time: 3:46
- */
+
 
 class Link {
 

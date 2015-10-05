@@ -132,12 +132,15 @@
             </br>
             <?php
         }} ?>
-
+</div>
+        <!--
+        THIS FAVICON STUFF DOES NOT WORK.
         <ul>
     <li><a href="http://www.danwebb.net">google</a></li>
         </ul>
     </div>
     <button onclick="getIcons()">ICON</button>
+    -->
 
 </div>
 <!-- /.container -->

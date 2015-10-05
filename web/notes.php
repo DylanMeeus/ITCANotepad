@@ -98,7 +98,7 @@
 
     <div class="mastfoot">
         <div class="inner">
-            <p>Copyright? COPYRIGHT? Nope. {Made by <a href="http://www.it-ca.net/blogdylan">Dylan Meeus</a>, but if you are using this, you probably know that} </p>
+            <p>No Copyright, d'uh!</p>
         </div>
     </div>
 </div>

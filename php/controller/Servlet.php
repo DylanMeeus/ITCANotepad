@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Dylan
- * Date: 4/08/2015
- * Time: 2:36
- */
+
 
 
 require_once "php/core/Facade.php";
@@ -142,6 +137,11 @@ class Servlet
             $pass = $_POST['password'];
             $token = $_POST['token'];
 
+            // We don't need to use the token anymore. Anyone can register now.
+            $user = $this->facade->register($username, $pass);
+            $_SESSION['user'] = $user;
+            $nextPage = "notes.php";
+            /*
             if ($token == "ISEEYOURGHOST")
             {
                 $user = $this->facade->register($username, $pass);
@@ -152,6 +152,7 @@ class Servlet
                 array_push($this->errors, "Wrong token!");
                 $nextPage = "register.php";
             }
+            */
         } elseif ($action == "deletenote")
         {
             $noteID = $_GET['noteid'];

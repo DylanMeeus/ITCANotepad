@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Dylan
- * Date: 4/08/2015
- * Time: 5:24
- */
 
 // ORM
 class Note {

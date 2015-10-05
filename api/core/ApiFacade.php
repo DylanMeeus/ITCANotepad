@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Dylan
- * Date: 10/09/2015
- * Time: 4:43
- */
 
 
 // A facade for what this API is able to do.

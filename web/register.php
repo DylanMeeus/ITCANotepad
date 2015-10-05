@@ -54,8 +54,8 @@
         <input type="text" name="username" id="username" class="form-control" placeholder="Username" required autofocus>
         <label for="inputPassword" class="sr-only">Password</label>
         <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
-        <label for="inputToken" class="sr-only">Token</label>
-        <input type="text" name="token" id="inputToken" class="form-control" placeholder="Token" required>
+  <!--      <label for="inputToken" class="sr-only">Token</label>
+        <input type="text" name="token" id="inputToken" class="form-control" placeholder="Token" required>-->
         <input type="submit" class="btn btn-lg btn-primary btn-block" value="Create">
     </form>
 
