@@ -4,6 +4,6 @@ RewriteCond %{REQUEST_FILENAME} -l [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^.*$ - [NC,L]
 RewriteRule ^.*$ index.php [NC,L]
-#RewriteRule    ^notes/?$    index.php?action=gotonotelist    [NC,L]    # Handle requests for "pet-care"
-#RewriteRule    ^notes/([0-9]+)/?$    index.php?action=opennote&noteid=$1    [NC,L]    # Handle product requests
-#RewriteRule    ^/?$    index.php    [NC,L]    # Handle product requests
+RewriteRule    ^notes/?$    index.php?action=gotonotelist    [NC,L]    # Handle requests for notes
+RewriteRule    ^notes/([0-9]+)/?$    index.php?action=opennote&noteid=$1    [NC,L]    # Handle product requests
+RewriteRule    ^/?$    index.php    [NC,L]    # Handle product requests

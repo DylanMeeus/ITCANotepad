@@ -1,5 +1,7 @@
 <?php
 
+require_once "core/Facade.php";
+
 class  NoteRestService{
 
     private $facade;
@@ -8,12 +10,12 @@ class  NoteRestService{
 
     public function __construct()
     {
-
+        $this->facade = new Facade();
     }
 
     public function getNoteById($id){
         $noteData = $this->facade->getNoteDetails(($id));
-        //array om alle data te bewaren
+        //array to parse all data in JSON
         $note = array("note_title" => $noteData->getTitle(), "note_text" => $noteData->getText(), "note_id" => $noteData->getID(),
             "note_userid" => $noteData->getUserID(), "note_colour" => $noteData->getColour());
 
