@@ -231,6 +231,21 @@ function getIcons()
 
 }
 
+function noteLookup(){
+    var note = document.getElementById("lookup").value;
+        $.ajax({
+            type: "GET",
+            url: "index.php?action=notelookup&word=" + note,
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status);
+                alert(thrownError);
+            },
+            success: function (result) {
+                setTimeout(function(){noteLookup();}, 3000);
+            }
+        });
+}
+
 window.onload=getIcons();
 
 $(window).bind('keydown',function(event){
