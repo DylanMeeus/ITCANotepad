@@ -128,7 +128,22 @@ class Servlet
             $user = $_SESSION["user"];
             $this->notes = $this->facade->getNotes($user->getID());
             $nextPage = "notes.php";
-        } elseif ($action == "gotoregister")
+        } elseif ($action == "notelookup")
+        {
+
+            $word = $_GET['word'];
+            if($word != null && $word != "") {
+
+                $lookupNotes = $this->lookupNote($word, $this->notes);
+                $this->notes = $lookupNotes;
+            } else{
+                $user = $_SESSION["user"];
+                $this->notes = $this->facade->getNotes($user->getID());
+            }
+            $this->redirect = false;
+        }
+
+        elseif ($action == "gotoregister")
         {
             $nextPage = "register.php";
         } elseif ($action == "register")
@@ -195,6 +210,8 @@ class Servlet
             $this->generateAPIKey();
             $this->redirect = false;
         }
+
+
         else{
             $nextPage = "errorpage.php";
         }
@@ -206,6 +223,26 @@ class Servlet
         }
     }
 
+
+    private function lookupNote($word, $notes){
+        $lookupNotes = array();
+        foreach($notes as $note ){
+            $gevonden = true;
+            // need to implement function for getting users from database with ID to retrieve username
+            // $username =
+            if(strlen($word) > strlen($note->getTitle())) {
+                $gevonden = false;
+            }
+            if(substr($note->getTitle(),0,strlen($word)) != $word){
+                $gevonden = false;
+            }
+            //for($i = 0; $i < strlen($word); $i++){
+                //if($word{i} != $note->getTitle(){i}){
+           // }
+            if($gevonden)  $lookupNotes[] = $note;
+        }
+        return $lookupNotes;
+    }
 
     private function generateAPIKey()
     {
