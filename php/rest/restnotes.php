@@ -1,15 +1,16 @@
 <?php
 
-require_once "core/Facade.php";
-
-class  NoteRestService{
+require_once "../core/Facade.php";
+require_once 'RestApi.php';
+class  NoteRestService extends RestApi{
 
     private $facade;
 
 
 
-    public function __construct()
+    public function __construct($request)
     {
+        parent::__construct($request);
         $this->facade = new Facade();
     }
 
