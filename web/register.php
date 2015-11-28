@@ -57,7 +57,7 @@
             <!-- javascript query for username availability? -->
             <!-- hide the button as long as the username is not accepted -->
         <label for="inputUsername" class="sr-only">Username</label>
-        <input oninput="checkUsername()" type="text" name="username" id="username" class="form-control" placeholder="Username" required autofocus>
+        <input oninput="checkUsername()" onchange="checkUsername()" type="text" name="username" id="username" class="form-control" placeholder="Username" required autofocus>
         <label for="inputPassword" class="sr-only">Password</label>
         <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
         <label for="repeatPassword" class="sr-only">Repeat password</label>
