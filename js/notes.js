@@ -105,7 +105,6 @@ function deleteLink(id)
         {
 
         }
-
     })
 }
 

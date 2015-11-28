@@ -195,6 +195,14 @@ class Servlet
             $this->generateAPIKey();
             $this->redirect = false;
         }
+        elseif($action == "isuniqueusername"){
+            // Pass username back as a string? well if we have one, not unique.
+            // echo back false/true? Maybe easiest.
+            // But do this in XML
+
+            $this->isUniqueUsername();
+            $this->redirect = false;
+        }
         else{
             $nextPage = "errorpage.php";
         }
@@ -204,6 +212,20 @@ class Servlet
         {
             require_once("web/" . $nextPage);
         }
+    }
+
+    private function isUniqueUsername()
+    {
+
+        $username = $_POST['username'];
+        if($this->facade->isUniqueUsername($username)){
+            echo "true";
+        }
+        else{
+            echo "false";
+        }
+
+
     }
 
 
@@ -234,7 +256,7 @@ class Servlet
         $newPassword = $_POST['newpassword'];
         $repeatPassword = $_POST['repeatpassword'];
 
-        // check if old password matches first lol
+        // check if old password matches first
 
         $user = $_SESSION["user"];
 

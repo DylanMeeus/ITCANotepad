@@ -95,6 +95,12 @@ class Facade
         return $key; // This we do so we can update the session's stored user!
     }
 
+    public function isUniqueUsername($username)
+    {
+        return $this->database->isUniqueUsername($username);
+    }
+
+    /* Leave private functions at the bottom */
     private function encrypt($inputtext)
     {
         return sha1($inputtext);

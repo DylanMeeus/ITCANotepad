@@ -389,4 +389,30 @@ class OnlineDB implements IDatabase
         $statement->execute();
         $this->closeConnection();
     }
+
+    /**
+     * Return true if the username does not yet appear in the database.
+     * @param $username
+     */
+    public function isUniqueUsername($username)
+    {
+        $this->openConnection();
+
+        $sql = "select * from users where username = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1,$username);
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $statement->execute();
+        $results = $statement->fetchAll();
+        $unique = true;
+        foreach ($results as $row)
+        {
+            // if we have a result, we know that it is not unique.
+            $unique = false;
+            break;
+        }
+        $this->closeConnection();
+        return $unique;
+
+    }
 }

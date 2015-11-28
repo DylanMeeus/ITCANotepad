@@ -11,6 +11,9 @@
 
     <title>Register</title>
 
+
+    <!-- first of all, load jquery -->
+    <script src="js/jquery.js"></script>
     <!-- Bootstrap core CSS -->
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
@@ -26,6 +29,8 @@
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+    <!-- make sure we alwyas load this javascript file for the validation functions. -->
+    <script src="js/login.js"></script>
 </head>
 
 <body>
@@ -48,16 +53,23 @@
 
             <?php }} ?>
 
-        <h2 class="form-signin-heading">Who the hell are you?</h2>
-
-        <label for="inputEmail" class="sr-only">Username</label>
-        <input type="text" name="username" id="username" class="form-control" placeholder="Username" required autofocus>
+        <h2 class="form-signin-heading">Register</h2>
+            <!-- javascript query for username availability? -->
+            <!-- hide the button as long as the username is not accepted -->
+        <label for="inputUsername" class="sr-only">Username</label>
+        <input oninput="checkUsername()" type="text" name="username" id="username" class="form-control" placeholder="Username" required autofocus>
         <label for="inputPassword" class="sr-only">Password</label>
         <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
+        <label for="repeatPassword" class="sr-only">Repeat password</label>
+        <!-- javascript can check this on the fly -->
+        <!-- colour it red if !match -->
+        <input type="repeatPassword" name="repeatPassword" id="repeatPassword" class="form-control" placeholder="Repeat password" required/>
   <!--      <label for="inputToken" class="sr-only">Token</label>
         <input type="text" name="token" id="inputToken" class="form-control" placeholder="Token" required>-->
+        <label for="inputMail" class="sr-only">Email</label>
+        <input type="text" name="mail" id="mail" class="form-control" placeholder="Mail" required autofocus>
         <input type="submit" class="btn btn-lg btn-primary btn-block" value="Create">
-    </form>
+    </form>101
 
 </div>
 <!-- /container -->
