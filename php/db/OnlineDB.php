@@ -8,9 +8,11 @@ require_once "php/core/Link.php";
 
 class OnlineDB implements IDatabase
 {
+    // change this when using the production database.
+    // Set up for the test database. (ghost)
     private $servername = "it-ca.net";
-    private $username = "itca_global";
-    private $password = "xgkzl9Af!pLv";
+    private $username = "itca_Insanity";
+    private $password = 't&Musk$StEJ[';
     private $con;
 
     public function __construct()
@@ -26,7 +28,7 @@ class OnlineDB implements IDatabase
     {
         try
         {
-            $this->con = new PDO("mysql:host=" . $this->servername . ";dbname=itca_notedb", $this->username, $this->password);
+            $this->con = new PDO("mysql:host=" . $this->servername . ";dbname=itca_ghostnotes", $this->username, $this->password);
             $this->con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (Exception $ex)
         {
