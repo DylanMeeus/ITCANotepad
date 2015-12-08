@@ -94,6 +94,33 @@ class OnlineDB implements IDatabase
         return $notes;
     }
 
+    public function getSharedNotes($userID)
+    {
+        $this->openConnection();
+
+        $sql = "select * from sharednotes sh JOIN notes n ON sharednoteID = noteID where sh.userID = ?";
+
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1, $userID);
+        $statement->execute();
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll();
+
+        $sharednotes = array();
+        foreach ($result as $row)
+        {
+            $note = new Note();
+            $note->setID($row['sharednoteID']);
+            $note->setTitle($row['title']);
+            $note->setText($row['notetext']);
+            $note->setColour($row['colour']);
+            $note->setUserID($row['userID']);
+            array_push($sharednotes, $note);
+        }
+        $this->closeConnection();
+        return $sharednotes;
+    }
+
     public function getNoteDetails($noteID)
     {
         $this->openConnection();
@@ -179,6 +206,25 @@ class OnlineDB implements IDatabase
         $statement->setFetchMode(PDO::FETCH_ASSOC);
         $result = $statement->fetchAll();
 
+            foreach ($result as $row)
+            {
+            $id = $row['m'];
+            break;
+        }
+        $this->closeConnection();
+        return $id;
+    }
+
+    private function getLastSharedNoteID() // helper function for sharednotes
+    {
+        $id = -1;
+        $this->openConnection();
+        $sql = "select max(sharednoteID) as m from sharednotes";
+        $statement = $this->con->prepare($sql);
+        $statement->execute();
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll();
+
         foreach ($result as $row)
         {
             $id = $row['m'];
@@ -234,6 +280,33 @@ class OnlineDB implements IDatabase
         return $links;
 
 
+    }
+
+    public function getUserFromUsername($username)
+    {
+        // return user from username
+        $this->openConnection();
+
+        $sql = "select * from users where username = ?";
+
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1, $username);
+
+        $statement->execute();
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll();
+
+        $user = new User();
+        foreach ($result as $row)
+        {
+            $user->setID($row['id']);
+            $user->setUsername($row['username']);
+            $user->setAPIKey($row['apikey']);
+
+            break; // only one user
+        }
+        $this->closeConnection();
+        return $user;
     }
 
     public function saveLink($noteID, $linkurl, $linkname)
@@ -376,6 +449,38 @@ class OnlineDB implements IDatabase
         $statement->execute();
         $this->closeConnection();
     }
+
+    public function addSharedNote($userID, $userIDList, $title)
+    {
+        $lastID = $this->getLastSharedNoteID();
+        ++$lastID;
+        $this->openConnection();
+
+        $sql = "insert into sharednotes(title,userID) values(?,?)";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1, $title);
+        $statement->bindParam(2, $userID);
+        $statement->execute();
+        $newSharedNote = new Note();
+        $newSharedNote->setID($lastID);
+        $newSharedNote->setTitle($title);
+        $newSharedNote->setUserIDList($userIDList);
+
+        foreach($userIDList as $id){
+            $sql = "insert into sharednotes_users(sharednoteID,userID) values(?,?)";
+            $statement = $this->con->prepare($sql);
+            $statement->bindParam(1, $lastID);
+            $statement->bindParam(2, $id);
+            $statement->execute();
+        }
+
+        $this->closeConnection();
+        return $newSharedNote;
+    }
+
+
+
+
 
 
     public function changepassword($userID, $newpassword) // it is a hashed new password but I'll improve this when I have time to be honest.

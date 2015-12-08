@@ -21,6 +21,7 @@
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
     <script src="../../assets/js/ie-emulation-modes-warning.js"></script>
+    <script type="text/javascript" src="js/notes.js"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -29,7 +30,7 @@
     <![endif]-->
 </head>
 
-<body>
+<body onload="setupPage()">
 
 
 <div class="container">
@@ -54,7 +55,47 @@
         </div>
     </nav>
 
-    <h1>Coming soon, to a theatre near you!</h1>
+    </br></br></br>
+
+    <!-- loop over the notifications -->
+    <?php if($this->notifications != null){
+        foreach($this->notifications as $notif) {?>
+            <p class="lead" style="color:green"><?php echo $notif ?></p>
+        <?php }}?>
+
+    <!-- let's not forget about the errors! -->
+
+    <?php if($this->errors != null){
+        foreach($this->errors as $error){ ?>
+            <p class="lead" style="color:red"><?php echo $error?></p>
+
+        <?php }} ?>
+    <input type="button" class="btn btn-lg btn-primary btn-block" value="New shared note" onclick="newnotepopup()">
+    <br/>
+    <div class="clearfix">
+        <input type="text" id="lookup" />
+    </div>
+    <br/>
+    <div id="newnotediv">
+        <form id="newnoteform" method="POST" action="index.php?action=createsharednote">
+            <label>Title: <input type="text" id="newnotetitle" name="newnotetitle"/></label>
+            <label id="users">Share with: <input type="text" id="user0" name="user0"/></label>
+            <br/>
+            <input type="submit" value="Create"/>
+        </form>
+        <input type="submit" value="Add other user" onclick="addUser()"/>
+
+    </div>
+
+    <div id="notelist">
+        <?php   if($this->notes != null){ foreach ($this->notes as $note) {
+            ?>
+            <a style="color:#<?php echo $note->getColour()?>" class="notelink" href=<?php echo "index.php?action=opennote&noteid=" . $note->getID()?>> <?php echo  $note->getTitle() ?></a>
+            <a class="deletenote" href=<?php echo "index.php?action=deletenote&noteid=" . $note->getID()?>> x</a>
+            </br>
+            <?php
+        }} ?>
+    </div>
 </div>
 <!-- /container -->
 

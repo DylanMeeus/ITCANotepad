@@ -33,66 +33,55 @@ class Servlet
         $this->redirect = true;
         // echo 'processing';
         $action = "gotologin";
-        if (isset($_GET['action']))
-        {
+        if (isset($_GET['action'])) {
             $action = $_GET['action'];
-        } elseif (isset($_POST['action']))
-        {
+        } elseif (isset($_POST['action'])) {
             $action = $_POST['action'];
         }
         $nextPage = "";
 
 
-        if ($action == "gotologin")
-        {
+        if ($action == "gotologin") {
             // Check the cookie
             // If there is a cookie with the correct username/password
             // Then go to the page with the logged in user information.
 
-            if (isset($_COOKIE['remembercookie']))
-            {
+            if (isset($_COOKIE['remembercookie'])) {
                 $user = new User();
                 $user->setID($_COOKIE['remembercookie']);
                 $user->setAPIKey($this->facade->getUsersAPIKey($user->getID()));
                 $_SESSION["user"] = $user;
                 $this->notes = $this->facade->getNotes($user->getID());
                 $nextPage = 'notes.php';
-            } else
-            {
+            } else {
                 $nextPage = 'home.php';
             }
 
             // try some database stuff
-        } elseif ($action == "login")
-        {
-            if (isset($_POST['username']) && isset($_POST['password']))
-            {
+        } elseif ($action == "login") {
+            if (isset($_POST['username']) && isset($_POST['password'])) {
                 $username = $_POST['username'];
                 $password = $_POST['password'];
                 // check if they are correct
                 $user = $this->facade->login($username, $password);
                 $_SESSION["user"] = $user;
-                if ($user != null)
-                {
+                if ($user != null) {
                     $this->notes = $this->facade->getNotes($user->getID());
                     $nextPage = 'notes.php';
 
                     // do we also need to remember  this user?
-                    if (isset($_POST['rememberme']))
-                    {
+                    if (isset($_POST['rememberme'])) {
                         // if isset evaluates to true; the checkbox was ticked.
                         $memory = $_POST['rememberme'];
                         setcookie("remembercookie", $user->getID());
                     }
-                } else
-                {
+                } else {
                     array_push($this->errors, "Wrong username/password");
                     $nextPage = 'home.php';
                 }
 
             }
-        } elseif ($action == "opennote")
-        {
+        } elseif ($action == "opennote") {
             $noteID = $_GET['noteid'];
             $_POST['noteid'] = $noteID; // get it async using jquery and writing a new query, or just loop here?
 
@@ -100,27 +89,43 @@ class Servlet
             $user = $_SESSION["user"];
 
             $this->note = $this->facade->getNoteDetails($noteID);
-            if ($this->note->getUserID() == $user->getID())
-            {
+            if ($this->note->getUserID() == $user->getID()) {
                 $this->notelinks = $this->facade->getLinks($noteID);
                 $nextPage = "notepage.php";
-            } else
-            {
+            } else {
                 $nextPage = "errorpage.php";
             }
-        } elseif ($action == "savenote")
-        {
+        } elseif ($action == "savenote") {
             $noteID = $_POST['noteid'];
             $textData = $_POST['textData'];
             $titleData = $_POST['titleData'];
             $colour = $_POST['colour'];
             $this->facade->updateNote($noteID, $titleData, $textData, $colour);
             $this->redirect = false;
-        } elseif ($action == "createnote")
-        {
+        } elseif ($action == "createnote") {
             $title = $_POST['newnotetitle'];
             $user = $_SESSION["user"];
             $this->note = $this->facade->addNote($user->getID(), $title);
+            $this->notelinks = null;
+            $nextPage = "notepage.php";
+        } elseif ($action == "createsharednote"){
+            $title = $_POST['newnotetitle'];
+            $user = $_SESSION["user"];
+            $userIds = array();
+            array_push($userIds, $user->getId());
+            $lastuser = false;
+            for($i = 0; !$lastuser; $i++){
+                        if(isset($_POST['user' . $i])){
+                            $sharedusername = $_POST['user' . $i];
+                           // print($sharedusername);
+                            $shareduser = $this->facade->getUserFromUsername($sharedusername);
+                            array_push($userIds, $shareduser->getID());
+                        }
+                        else{
+                            $lastuser = true;
+                }
+            }
+            $this->note = $this->facade->addSharedNote($user->getID(), $userIds, $title);
             $this->notelinks = null;
             $nextPage = "notepage.php";
         } elseif ($action == "gotonotelist")
@@ -199,6 +204,8 @@ class Servlet
             $nextPage = $this->changePassword();
         } elseif ($action == "gotoSharedNotes")
         {
+            $user = $_SESSION["user"];
+            $this->notes = $this->facade->getSharedNotes($user->getID());
             $nextPage = $this->gotoSharedNotes();
         }
         elseif($action == "gotochangepassword")
@@ -237,9 +244,9 @@ class Servlet
                 $gevonden = false;
             }
             //for($i = 0; $i < strlen($word); $i++){
-                //if($word{i} != $note->getTitle(){i}){
-           // }
-            if($gevonden)  $lookupNotes[] = $note;
+            //if($word{i} != $note->getTitle(){i}){
+            // }
+            if($gevonden)  array_push($lookupNotes, $note);
         }
         return $lookupNotes;
     }

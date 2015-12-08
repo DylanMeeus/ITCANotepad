@@ -5,6 +5,7 @@
 
 
 var saved = true;
+var sharedUsers = 0;
 function setupNoteDetailPage()
 {
 
@@ -40,7 +41,14 @@ function setupPage()
     // apply fade-in to the other div?
 }
 
-
+function addUser(){
+    ++sharedUsers;
+    var txt = $("<input/>");
+    txt.attr("type", "text");
+    txt.attr("id", "user" + sharedUsers);
+    txt.attr("name", "user" + sharedUsers);
+    $("#users").append(txt);
+}
 
 
 function saveLink()

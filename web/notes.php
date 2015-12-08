@@ -81,8 +81,9 @@
     <br/>
     <div class="clearfix">
         <input type="text" id="lookup" />
-        <br/>
+
     </div>
+    <br/>
         <div id="newnotediv">
             <form id="newnoteform" method="POST" action="index.php?action=createnote">
                 <label>Title: <input type="text" id="newnotetitle" name="newnotetitle"/></label>

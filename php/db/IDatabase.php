@@ -9,6 +9,9 @@ interface IDatabase
     public function getNoteDetails($noteID);
     public function addNote($userID, $title); // returns an instance of the new note!
     public function getNoteText($userID, $title);
+    public function getUserFromUsername($username);
+    public function addSharedNote($userID, $userIDList, $title);
+    public function getSharedNotes($userID);
     public function deleteNote($noteID);
     public function updateNote($noteID, $noteTitle, $noteText, $colour);
     public function register($username,$password);
