@@ -22,6 +22,7 @@ interface IDatabase
     public function verifyPassword($userID, $password);
     public function addAPIKey($userID, $key);
     public function getUsersAPIKey($userID);
+    public function isUniqueUsername($username);
 }
 // CGI
 ?>

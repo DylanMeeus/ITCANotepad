@@ -24,11 +24,6 @@ class Facade
         return $this->database->getNotes($userID);
     }
 
-    public function getSharedNotes($userID)
-    {
-        return $this->database->getSharedNotes($userID);
-    }
-
     public function getNoteDetails($noteID)
     {
         return $this->database->getNoteDetails($noteID);
@@ -100,20 +95,16 @@ class Facade
         return $key; // This we do so we can update the session's stored user!
     }
 
-    public function getUserFromUsername($username){
-        return $this->database->getUserFromUsername($username);
+    public function isUniqueUsername($username)
+    {
+        return $this->database->isUniqueUsername($username);
     }
 
-    public function addSharedNote($userID, $userIDList, $title){
-        return $this->database->addSharedNote($userID, $userIDList, $title);
-    }
-
+    /* Leave private functions at the bottom */
     private function encrypt($inputtext)
     {
         return sha1($inputtext);
     }
-
-
 
 }
 
