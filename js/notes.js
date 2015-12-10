@@ -44,10 +44,36 @@ function setupPage()
 function addUser(){
     ++sharedUsers;
     var txt = $("<input/>");
+    var label = $("<label/>");
+
+    label.text("User " + sharedUsers + ":");
+    var select = $("<select/>");
+
+
+    select.attr("id", "rightID" + sharedUsers)
+    .attr("name", "rightID" + sharedUsers);
+    select.append($("<option></option>")
+        .attr("value",2)
+        .text("Read"));
+    select.append($("<option></option>")
+        .attr("value",3)
+        .attr("selected", "selected")
+        .text("Read/Write"));
+
+
+
     txt.attr("type", "text");
     txt.attr("id", "user" + sharedUsers);
     txt.attr("name", "user" + sharedUsers);
-    $("#users").append(txt);
+        $("#users").append(label)
+            .append(txt)
+            .append(select)
+            .append("&nbsp;");
+        if (sharedUsers % 3 == 0) {
+            var br = $("<br/>");
+            $("#users").append(br);
+        }
+
 }
 
 
@@ -243,10 +269,6 @@ function noteLookup(){
         $.ajax({
             type: "GET",
             url: "index.php?action=notelookup&word=" + note,
-            error: function (xhr, ajaxOptions, thrownError) {
-                alert(xhr.status);
-                alert(thrownError);
-            },
             success: function (result) {
                 setTimeout(function(){noteLookup();}, 3000);
             }

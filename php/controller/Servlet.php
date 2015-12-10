@@ -17,6 +17,9 @@ class Servlet
     private $note;
     private $redirect;
     private $notelinks;
+    private $shared;
+    private $owner;
+
 
     // We need to get rid of saying "Echo" in the servlet. ECHO == UI stuff; out with that demon here!
     private $errors = array(); // Logs the errors that occur -> each page loops over this array to see if it needs to display something
@@ -93,6 +96,7 @@ class Servlet
             }
         } elseif ($action == "opennote")
         {
+            $this->shared = false;
             $noteID = $_GET['noteid'];
             $_POST['noteid'] = $noteID; // get it async using jquery and writing a new query, or just loop here?
 
@@ -108,7 +112,33 @@ class Servlet
             {
                 $nextPage = "errorpage.php";
             }
-        } elseif ($action == "savenote")
+        } elseif ($action == "opensharednote")
+        {
+            $this->shared = true;
+            $noteID = $_GET['noteid'];
+            $_POST['noteid'] = $noteID; // get it async using jquery and writing a new query, or just loop here?
+
+            // does the note belong to this user?
+            $user = $_SESSION["user"];
+
+            $this->note = $this->facade->getSharedNoteDetails($noteID);
+            $foundID = false;
+            foreach($this->note->getSharedUsers() as $shareduser){
+                if ($shareduser->getID() == $user->getID())
+                {
+                    $foundID = true;
+                    $this->notelinks = $this->facade->getLinks($noteID);
+                    $nextPage = "notepage.php";
+                    break;
+                }
+            }
+            if(!$foundID){
+                $nextPage = "errorpage.php";
+            }
+
+        }
+
+        elseif ($action == "savenote")
         {
             $noteID = $_POST['noteid'];
             $textData = $_POST['textData'];
@@ -123,7 +153,30 @@ class Servlet
             $this->note = $this->facade->addNote($user->getID(), $title);
             $this->notelinks = null;
             $nextPage = "notepage.php";
-        } elseif ($action == "gotonotelist")
+        } elseif ($action == "createsharednote") {
+            $this->shared = true;
+            $title = $_POST['newnotetitle'];
+            $user = $_SESSION["user"];
+            $users = array();
+            $rightIds = array();
+            $lastuser = false;
+            for ($i = 1; !$lastuser; $i++) {
+                if (isset($_POST['user' . $i])) {
+                    $sharedusername = $_POST['user' . $i];
+                    $shareduser = $this->facade->getUserFromUsername($sharedusername);
+                    array_push($users, $shareduser);
+                    $rightID = $_POST['rightID' . $i];
+                    array_push($rightIds, $rightID);
+                }
+                else {
+                    $lastuser = true;
+                }
+            }
+            $this->note = $this->facade->addSharedNote($user->getID(), $users, $title, $rightIds);
+            $this->notelinks = null;
+            $nextPage = "notepage.php";
+        }
+        elseif ($action == "gotonotelist")
         {
             $user = $_SESSION["user"];
             $this->notes = $this->facade->getNotes($user->getID());
@@ -135,7 +188,6 @@ class Servlet
         {
             $username = $_POST['username'];
             $pass = $_POST['password'];
-            $token = $_POST['token'];
 
             // We don't need to use the token anymore. Anyone can register now.
             $user = $this->facade->register($username, $pass);
@@ -160,7 +212,14 @@ class Servlet
             $user = $_SESSION['user'];
             $this->notes = $this->facade->getNotes($user->getID());
             $nextPage = "notes.php";
-        } elseif ($action == "savelink")
+        } elseif ($action == "deletesharednote")
+        {
+            $noteID = $_GET['noteid'];
+            $this->facade->deleteSharedNote($noteID);
+
+            $nextPage = $this->gotoSharedNotes();
+        }
+        elseif ($action == "savelink")
         {
             echo "saving";
             $linkurl = $_POST['linkUrl'];
@@ -184,11 +243,27 @@ class Servlet
             $nextPage = $this->changePassword();
         } elseif ($action == "gotoSharedNotes")
         {
+
+            $user = $_SESSION["user"];
+            $this->notes = $this->facade->getSharedNotes($user->getID());
             $nextPage = $this->gotoSharedNotes();
         }
         elseif($action == "gotochangepassword")
         {
             $nextPage = "changepassword.php";
+        }
+        elseif ($action == "notelookup")
+        {
+            $word = $_GET['word'];
+            if($word != null && $word != "") {
+
+                $lookupNotes = $this->lookupNote($word, $this->notes);
+                $this->notes = $lookupNotes;
+            } else{
+                $user = $_SESSION["user"];
+                $this->notes = $this->facade->getNotes($user->getID());
+            }
+            $this->redirect = false;
         }
         elseif($action == "generateAPIkey")
         {
@@ -206,7 +281,6 @@ class Servlet
         else{
             $nextPage = "errorpage.php";
         }
-
 
         if ($this->redirect)
         {

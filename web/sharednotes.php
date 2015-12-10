@@ -78,20 +78,26 @@
     <br/>
     <div id="newnotediv">
         <form id="newnoteform" method="POST" action="index.php?action=createsharednote">
-            <label>Title: <input type="text" id="newnotetitle" name="newnotetitle"/></label>
-            <label id="users">Share with: <input type="text" id="user0" name="user0"/></label>
+            <label>Title: </label><input type="text" id="newnotetitle" name="newnotetitle"/>
+            <br/><br/>
+            <div id="users">
+                <label>Share with:</label>
+                <br/><br/>
+            </select>
+            </div>
             <br/>
-            <input type="submit" value="Create"/>
+            <input type="button" class="btn btn-default btn-primary" value="Add user" onclick="addUser()"/>
+            <input type="submit" class="btn btn-default btn-primary" value="Create"/>
         </form>
-        <input type="submit" value="Add other user" onclick="addUser()"/>
+
 
     </div>
 
     <div id="notelist">
-        <?php   if($this->notes != null){ foreach ($this->notes as $note) {
+        <?php  if($this->notes != null){ foreach ($this->notes as $note) {
             ?>
-            <a style="color:#<?php echo $note->getColour()?>" class="notelink" href=<?php echo "index.php?action=opennote&noteid=" . $note->getID()?>> <?php echo  $note->getTitle() ?></a>
-            <a class="deletenote" href=<?php echo "index.php?action=deletenote&noteid=" . $note->getID()?>> x</a>
+           <p><a style="color:#<?php echo $note->getColour()?>" class="notelink" href=<?php echo "index.php?action=opensharednote&noteid=" . $note->getID()?>> <?php echo  $note->getTitle() ?></a> Owner:
+            <a class="deletenote" href=<?php echo "index.php?action=deletesharednote&noteid=" . $note->getID()?>> x</a></p>
             </br>
             <?php
         }} ?>

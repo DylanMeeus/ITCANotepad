@@ -24,6 +24,28 @@ class Facade
         return $this->database->getNotes($userID);
     }
 
+    public function getSharedNotes($userID)
+    {
+        return $this->database->getSharedNotes($userID);
+    }
+
+    public function getSharedNoteDetails($noteID)
+    {
+        return $this->database->getSharedNoteDetails($noteID);
+    }
+
+    public function getUserFromUsername($username){
+        return $this->database->getUserFromUsername($username);
+    }
+
+    public function deleteSharedNote($noteID){
+        $this->database->deleteSharedNote($noteID);
+    }
+
+    public function getUserDetails($userID){
+        return $this->database->getUserDetails($userID);
+    }
+
     public function getNoteDetails($noteID)
     {
         return $this->database->getNoteDetails($noteID);
@@ -42,6 +64,11 @@ class Facade
     public function addNote($userID, $noteTitle)
     {
         return $this->database->addNote($userID, $noteTitle);
+    }
+
+    public function addSharedNote($userID, $users, $title, $rightIDList)
+    {
+        return $this->database->addSharedNote($userID, $users, $title, $rightIDList);
     }
 
     public function register($username, $password) // return instance of new user - perform some null checks in servlet though.

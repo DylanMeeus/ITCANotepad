@@ -75,7 +75,7 @@ class OnlineDB implements IDatabase
     {
         $this->openConnection();
 
-        $sql = "select * from notes where userID = ?";
+        $sql = "select * from notes n LEFT join sharednotes sh on n.noteID = sh.sharednoteID where sh.sharednoteID IS NULL and n.userID = ?";
         $statement = $this->con->prepare($sql);
         $statement->bindParam(1, $userID);
         $statement->execute();
@@ -100,7 +100,7 @@ class OnlineDB implements IDatabase
     {
         $this->openConnection();
 
-        $sql = "select * from sharednotes sh JOIN notes n ON sharednoteID = noteID where sh.userID = ?";
+        $sql = "select sharednoteID, sh.userID, rightID, title, notetext, colour from sharednotes sh JOIN notes n ON sharednoteID = noteID where sh.userID = ?";
 
         $statement = $this->con->prepare($sql);
         $statement->bindParam(1, $userID);
@@ -117,6 +117,12 @@ class OnlineDB implements IDatabase
             $note->setText($row['notetext']);
             $note->setColour($row['colour']);
             $note->setUserID($row['userID']);
+
+            $user = new User();
+            $user->setID($row['userID']);
+            $username = $this->getUserDetails($row['userID'])->getUsername();
+            $user->setUsername($username);
+            array_push($note->getSharedUsers(), $user);
             array_push($sharednotes, $note);
         }
         $this->closeConnection();
@@ -141,11 +147,36 @@ class OnlineDB implements IDatabase
             $notedetails->setTitle($row['title']);
             $notedetails->setColour($row['colour']);
             $notedetails->setUserID($row['userID']);
-            //break; // there can't be more than one note tbh; really want to do an explicit goto here in asm? mh.
+            break; // there can't be more than one note tbh; really want to do an explicit goto here in asm? mh.
         }
+
         $this->closeConnection();
         return $notedetails;
+    }
 
+    public function getSharedNoteDetails($noteID){
+
+        $notedetails = $this->getNoteDetails($noteID);
+        $this->openConnection();
+        $sql = "select * from sharednotes where sharednoteID = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1, $noteID);
+        $statement->execute();
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll();
+
+        $users = array();
+        foreach ($result as $row)
+        {
+            $user = new User();
+            $user->setID($row['userID']);
+            $username = $this->getUserDetails($row['userID'])->getUsername();
+            $user->setUsername($username);
+            array_push($users, $user);
+        }
+        $notedetails->setSharedUsers($users);
+        $this->closeConnection();
+        return $notedetails;
     }
 
     public function updateNote($noteID, $noteTitle, $noteText, $colour)
@@ -217,24 +248,6 @@ class OnlineDB implements IDatabase
         return $id;
     }
 
-    private function getLastSharedNoteID() // helper function for sharednotes
-    {
-        $id = -1;
-        $this->openConnection();
-        $sql = "select max(sharednoteID) as m from sharednotes";
-        $statement = $this->con->prepare($sql);
-        $statement->execute();
-        $statement->setFetchMode(PDO::FETCH_ASSOC);
-        $result = $statement->fetchAll();
-
-        foreach ($result as $row)
-        {
-            $id = $row['m'];
-            break;
-        }
-        $this->closeConnection();
-        return $id;
-    }
 
     public function register($username, $password)
     {
@@ -452,27 +465,32 @@ class OnlineDB implements IDatabase
         $this->closeConnection();
     }
 
-    public function addSharedNote($userID, $userIDList, $title)
+    public function addSharedNote($userID, $users, $title, $rightIDList)
     {
-        $lastID = $this->getLastSharedNoteID();
-        ++$lastID;
-        $this->openConnection();
 
-        $sql = "insert into sharednotes(title,userID) values(?,?)";
+        $this->addNote($userID, $title);
+
+        $lastID = $this->getLastNoteID();
+        $this->openConnection();
+        $rightID = 1;
+        $sql = "insert into sharednotes(sharednoteID,userID,rightID) values(?,?,?)";
         $statement = $this->con->prepare($sql);
-        $statement->bindParam(1, $title);
+        $statement->bindParam(1, $lastID);
         $statement->bindParam(2, $userID);
+        $statement->bindParam(3, $rightID);
         $statement->execute();
         $newSharedNote = new Note();
         $newSharedNote->setID($lastID);
         $newSharedNote->setTitle($title);
-        $newSharedNote->setUserIDList($userIDList);
+        $newSharedNote->setSharedUsers($users);
 
-        foreach($userIDList as $id){
-            $sql = "insert into sharednotes_users(sharednoteID,userID) values(?,?)";
+
+        for($i = 0; $i < sizeof($users); $i++){
+            $sql = "insert into sharednotes(sharednoteID,userID,rightID) values(?,?,?)";
             $statement = $this->con->prepare($sql);
             $statement->bindParam(1, $lastID);
-            $statement->bindParam(2, $id);
+            $statement->bindParam(2, $users[$i]->getID());
+            $statement->bindParam(3, $rightIDList[$i]);
             $statement->execute();
         }
 
@@ -480,9 +498,39 @@ class OnlineDB implements IDatabase
         return $newSharedNote;
     }
 
+    public function deleteSharedNote($noteID)
+    {
+        $this->deleteNote($noteID);
+        $this->openConnection();
+        $sql = "delete from sharednotes where sharednoteID = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1, $noteID);
+        $statement->execute();
+        $this->closeConnection();
+    }
 
+    public function getUserDetails($userID)
+    {
+        $this->openConnection();
+        $sql = "select * from users where id = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1, $userID);
+        $statement->execute();
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll();
 
+        $user = new User();
+        foreach ($result as $row)
+        {
+            $user->setID($row['id']);
+            $user->setAPIKey($row['apikey']);
+            $user->setUsername($row['username']);
+           break; // there can't be more than one user tbh; really want to do an explicit goto here in asm? mh.
+        }
 
+        $this->closeConnection();
+        return $user;
+    }
 
 
     public function changepassword($userID, $newpassword) // it is a hashed new password but I'll improve this when I have time to be honest.

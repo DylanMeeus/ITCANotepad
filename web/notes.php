@@ -86,8 +86,8 @@
     <br/>
         <div id="newnotediv">
             <form id="newnoteform" method="POST" action="index.php?action=createnote">
-                <label>Title: <input type="text" id="newnotetitle" name="newnotetitle"/></label>
-                <input type="submit" value="Create">
+                <label>Title: </label><input type="text" id="newnotetitle" name="newnotetitle"/>
+                <input type="submit" class="btn btn-default btn-primary" value="Create"/>
             </form>
         </div>
 

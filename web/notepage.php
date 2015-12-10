@@ -103,7 +103,7 @@
     <h3 id="savedID">Saved</h3>
 
     <div id="notetextdiv"  class="form-group">
-        <input style="font-size:25px" type="text" id="titleid" <?php echo "value=\"" . $this->note->getTitle() ."\""?>/>  <label>Colour:<input id="colourid" class="color"></label>
+        <input style="font-size:25px" type="text" id="titleid" <?php echo "value=\"" . $this->note->getTitle() ."\""?>/>  <label>Colour:<input id="colourid" class="color"></label>  <label>Shared users:</label> <?php foreach($this->note->getSharedUsers() as $user){ echo $user->getUsername(); ?> &nbsp; <?php } ?>
         </br>
         <label for="message"></label>
         <textarea class="form-control" rows="10" id="textid"><?php echo $this->note->getText() ?></textarea>
@@ -133,6 +133,16 @@
             <?php
         }} ?>
 </div>
+    <br/>
+    <?php if($this->shared){ ?>
+    <div id="users">
+
+    </div>
+        <br/>
+        <input type="button" class="btn btn-default btn-primary" value="Add other user" onclick="addUser()"/>
+        <input type="button" class="btn btn-default btn-primary" value="Confirm"/>
+        <?php
+    } ?>
         <!--
         THIS FAVICON STUFF DOES NOT WORK.
         <ul>
