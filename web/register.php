@@ -63,14 +63,18 @@
         <label for="repeatPassword" class="sr-only">Repeat password</label>
         <!-- javascript can check this on the fly -->
         <!-- colour it red if !match -->
-        <input type="repeatPassword" name="repeatPassword" id="repeatPassword" class="form-control" placeholder="Repeat password" required/>
+        <input type="password" name="repeatPassword" id="repeatPassword" class="form-control" placeholder="Repeat password" required/>
   <!--      <label for="inputToken" class="sr-only">Token</label>
         <input type="text" name="token" id="inputToken" class="form-control" placeholder="Token" required>-->
-        <label for="inputMail" class="sr-only">Email</label>
-        <input type="text" name="mail" id="mail" class="form-control" placeholder="Mail" required autofocus>
+        <label for="inputMail" class="sr-only">Email*</label>
+        <input type="text" name="mail" id="mail" class="form-control" placeholder="Mail" autofocus>
         <input type="submit" class="btn btn-lg btn-primary btn-block" value="Create">
-    </form>101
+    </form>
 
+
+    <p>* the e-mail field is not required. We respect your privacy and agree that using your e-mail address all around the web can be a bad idea. We
+    do however offer the possibility so you can restore your password in case you lost it. You e-mail will not be used for any other purposes, and you can set it up
+    at any time.</p>
 </div>
 <!-- /container -->
 
