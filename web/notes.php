@@ -34,7 +34,7 @@
     <![endif]-->
 </head>
 
-<body onload="setupPage()">
+<body onload="setupPage(), noteLookup()">
 
 
 <div class="container">
@@ -78,7 +78,12 @@
         <?php }} ?>
 
     <input type="button" class="btn btn-lg btn-primary btn-block" value="New note" onclick="newnotepopup()">
+    <br/>
+    <div class="clearfix">
+        <input type="text" id="lookup" />
 
+    </div>
+    <br/>
         <div id="newnotediv">
             <form id="newnoteform" method="POST" action="index.php?action=createnote">
                 <label>Title: <input type="text" id="newnotetitle" name="newnotetitle"/></label>

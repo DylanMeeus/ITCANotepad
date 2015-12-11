@@ -5,6 +5,7 @@
 
 
 var saved = true;
+var sharedUsers = 0;
 function setupNoteDetailPage()
 {
 
@@ -40,7 +41,14 @@ function setupPage()
     // apply fade-in to the other div?
 }
 
-
+function addUser(){
+    ++sharedUsers;
+    var txt = $("<input/>");
+    txt.attr("type", "text");
+    txt.attr("id", "user" + sharedUsers);
+    txt.attr("name", "user" + sharedUsers);
+    $("#users").append(txt);
+}
 
 
 function saveLink()
@@ -228,6 +236,21 @@ function getIcons()
     console.log("Getting icons <3");
     jQuery('#oldlinks').favicons({insert: 'insertBefore'});
 
+}
+
+function noteLookup(){
+    var note = document.getElementById("lookup").value;
+        $.ajax({
+            type: "GET",
+            url: "index.php?action=notelookup&word=" + note,
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status);
+                alert(thrownError);
+            },
+            success: function (result) {
+                setTimeout(function(){noteLookup();}, 3000);
+            }
+        });
 }
 
 window.onload=getIcons();
