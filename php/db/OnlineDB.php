@@ -100,7 +100,7 @@ class OnlineDB implements IDatabase
     {
         $this->openConnection();
 
-        $sql = "select sharednoteID, sh.userID, rightID, title, notetext, colour from sharednotes sh JOIN notes n ON sharednoteID = noteID where sh.userID = ?";
+        $sql = "select sharednoteID, sh.userID as sharedID, rightID, title, notetext, colour, n.userID as ownerID from sharednotes sh JOIN notes n ON sharednoteID = noteID where sh.userID = ?";
 
         $statement = $this->con->prepare($sql);
         $statement->bindParam(1, $userID);
@@ -109,6 +109,7 @@ class OnlineDB implements IDatabase
         $result = $statement->fetchAll();
 
         $sharednotes = array();
+
         foreach ($result as $row)
         {
             $note = new Note();
@@ -116,17 +117,56 @@ class OnlineDB implements IDatabase
             $note->setTitle($row['title']);
             $note->setText($row['notetext']);
             $note->setColour($row['colour']);
-            $note->setUserID($row['userID']);
+            $note->setUserID($row['ownerID']);
 
+            $users = array();
             $user = new User();
-            $user->setID($row['userID']);
-            $username = $this->getUserDetails($row['userID'])->getUsername();
+            $user->setID($row['ownerID']);
+            $username = $this->getUserDetails($row['ownerID'])->getUsername();
             $user->setUsername($username);
-            array_push($note->getSharedUsers(), $user);
+            array_push($users, $user);
+            $note->setSharedUsers($users);
             array_push($sharednotes, $note);
         }
         $this->closeConnection();
         return $sharednotes;
+    }
+
+    /*public function deleteSharedNote($noteID)
+    {
+        $this->deleteNote($noteID);
+        $this->openConnection();
+        $sql = "delete from sharednotes where sharednoteID = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1, $noteID);
+        $statement->execute();
+        $this->closeConnection();
+    }*/
+
+    public function deleteSharedUser($userID, $noteID)
+    {
+        $this->openConnection();
+        $sql = "delete from sharednotes where sharednoteID = ? and userID = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1, $noteID);
+        $statement->bindParam(2, $userID);
+        $statement->execute();
+        $this->closeConnection();
+    }
+
+    public function addSharedUsers($noteID, $users, $rightIDList)
+    {
+        $this->openConnection();
+        for($i = 0; $i < sizeof($users);$i++){
+            $sql = "insert into sharednotes(sharednoteID,userID,rightID) values(?,?,?)";
+            $statement = $this->con->prepare($sql);
+            $statement->bindParam(1, $noteID);
+            $statement->bindParam(2, $users[$i]->getID());
+            $statement->bindParam(3, $rightIDList[$i]);
+            $statement->execute();
+        }
+
+        $this->closeConnection();
     }
 
     public function getNoteDetails($noteID)
@@ -174,6 +214,7 @@ class OnlineDB implements IDatabase
             $user->setUsername($username);
             array_push($users, $user);
         }
+        $notedetails->setSharedUsers($users);
         $notedetails->setSharedUsers($users);
         $this->closeConnection();
         return $notedetails;
@@ -467,7 +508,6 @@ class OnlineDB implements IDatabase
 
     public function addSharedNote($userID, $users, $title, $rightIDList)
     {
-
         $this->addNote($userID, $title);
 
         $lastID = $this->getLastNoteID();
@@ -481,8 +521,9 @@ class OnlineDB implements IDatabase
         $statement->execute();
         $newSharedNote = new Note();
         $newSharedNote->setID($lastID);
+        $newSharedNote->setUserID($userID);
         $newSharedNote->setTitle($title);
-        $newSharedNote->setSharedUsers($users);
+
 
 
         for($i = 0; $i < sizeof($users); $i++){
@@ -493,6 +534,9 @@ class OnlineDB implements IDatabase
             $statement->bindParam(3, $rightIDList[$i]);
             $statement->execute();
         }
+        $user = $this->getUserDetails($userID);
+        array_unshift($users, $user);
+        $newSharedNote->setSharedUsers($users);
 
         $this->closeConnection();
         return $newSharedNote;

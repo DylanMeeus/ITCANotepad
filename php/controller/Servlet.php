@@ -17,8 +17,8 @@ class Servlet
     private $note;
     private $redirect;
     private $notelinks;
+    //true: shows extra partials needed for options for shared notes
     private $shared;
-    private $owner;
 
 
     // We need to get rid of saying "Echo" in the servlet. ECHO == UI stuff; out with that demon here!
@@ -27,6 +27,7 @@ class Servlet
 
     public function __construct()
     {
+        $this->shared = false;
         $this->facade = new Facade();
     }
 
@@ -216,8 +217,37 @@ class Servlet
         {
             $noteID = $_GET['noteid'];
             $this->facade->deleteSharedNote($noteID);
-
+            $user = $_SESSION['user'];
+            $this->notes = $this->facade->getSharedNotes($user->getID());
             $nextPage = $this->gotoSharedNotes();
+        } elseif($action == "deleteuser"){
+            $userID = $_GET['userid'];
+            $noteID = $_GET['noteid'];
+            $this->facade->deleteSharedUser($userID, $noteID);
+            $this->note = $this->facade->getSharedNoteDetails($noteID);
+            $this->shared = true;
+            $nextPage = "notepage.php";
+        } elseif($action == "addsharedusers"){
+            $noteID = $_POST['noteID'];
+            $users = array();
+            $rightIds = array();
+            $lastuser = false;
+            for ($i = 1; !$lastuser; $i++) {
+                if (isset($_POST['user' . $i])) {
+                    $sharedusername = $_POST['user' . $i];
+                    $shareduser = $this->facade->getUserFromUsername($sharedusername);
+                    array_push($users, $shareduser);
+                    $rightID = $_POST['rightID' . $i];
+                    array_push($rightIds, $rightID);
+                }
+                else {
+                    $lastuser = true;
+                }
+            }
+            $this->facade->addSharedUsers($noteID, $users, $rightIds);
+            $this->shared = true;
+            $this->note = $this->facade->getSharedNoteDetails($noteID);
+            $nextPage = "notepage.php";
         }
         elseif ($action == "savelink")
         {
@@ -243,7 +273,6 @@ class Servlet
             $nextPage = $this->changePassword();
         } elseif ($action == "gotoSharedNotes")
         {
-
             $user = $_SESSION["user"];
             $this->notes = $this->facade->getSharedNotes($user->getID());
             $nextPage = $this->gotoSharedNotes();
@@ -271,9 +300,6 @@ class Servlet
             $this->redirect = false;
         }
         elseif($action == "isuniqueusername"){
-            // Pass username back as a string? well if we have one, not unique.
-            // echo back false/true? Maybe easiest.
-            // But do this in XML
 
             $this->isUniqueUsername();
             $this->redirect = false;
@@ -299,6 +325,10 @@ class Servlet
             echo "false";
         }
 
+
+    }
+
+    private function goToSharedNotePage(){
 
     }
 
