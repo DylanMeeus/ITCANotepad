@@ -101,7 +101,7 @@ class Facade
     }
 
     /*
-     * Returns TRUE if email was found. False otherwise/
+     * Returns the recoveryString if the mail was found. False otherwise.
      */
     public function startPasswordRecovery($mail)
     {

@@ -36,30 +36,48 @@ function recoverPassword()
 
     // First we need to get the password from the database.
 
-    var mail = document.getElementById("recoveryMail").textContent;
+    var mail = document.getElementById("email").value;;
     console.log(mail);
 
+    if(mail != "")
+    {
+        $.ajax({
 
-    $.ajax({
-        type: "POST",
-        url: "https://mandrillapp.com/api/1.0/messages/send.json",
-        data: {
-            "key": "jzYtZum9FGfYsYEQQZC6qg",
-            'message': {
-                'from_email': 'password-recovery-bot@it-ca.net',
-                'to': [
-                    {
-                        'email': 'meeusdylan@hotmail.com',
-                        'name': 'Dylan',
-                        'type': 'to'
+            type:"GET",
+            url:"index.php?action=startpasswordrecovery&email="+mail,
+            success:function(result){
+                $.ajax({
+                    type: "POST",
+                    url: "https://mandrillapp.com/api/1.0/messages/send.json",
+                    data: {
+                        "key": "jzYtZum9FGfYsYEQQZC6qg",
+                        'message': {
+                            'from_email': 'password-recovery-bot@it-ca.net',
+                            'to': [
+                                {
+                                    'email': mail,
+                                    'name': mail.substring(0,mail.indexOf("@")),
+                                    'type': 'to'
+                                }
+                            ],
+                            'autotext': 'true',
+                            'subject': '++Notepad password recovery.',
+                            'html': "It seems like you have lost your password to www.it-ca.net/notepad. But, fear not for help is here! Follow this link to recover your password. " +
+                            "www.it-ca.net/notepad/index.php?action=gotorecoverpassword&recoveryid="+result+". "
+                        }
                     }
-                ],
-                'autotext': 'true',
-                'subject': '++Notepad password recovery.',
-                'html': 'You have a note open on it-ca!!'
+                }).done(function(response) {
+                    console.log(response); // if you're into that sorta thing
+                });
             }
-        }
-    }).done(function(response) {
-        console.log(response); // if you're into that sorta thing
-    });
+        });
+
+
+
+
+    }
+    else
+    {
+        alert("field can not be empty");
+    }
 }

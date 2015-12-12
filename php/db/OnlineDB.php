@@ -532,7 +532,7 @@ class OnlineDB implements IDatabase
         {
             return false; // ?o user was found with this mail.
         }
-        $recoveryString = $userID.$recoveryString;
+        $recoveryString = $userID.'-'.$recoveryString;
         $this->openConnection();
         $sql = "insert into passwordrecovery(userID, recoverystring) values (?,?)";
         $statement = $this->con->prepare($sql);
@@ -540,7 +540,7 @@ class OnlineDB implements IDatabase
         $statement->bindParam(2,$recoveryString);
         $statement->execute();
         $this->closeConnection();
-        return true;
+        return $recoveryString;
     }
 
     private function getIDFromMail($mail)

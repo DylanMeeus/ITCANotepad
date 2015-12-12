@@ -27,8 +27,6 @@
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-
-    <script type="text/javascript" src="js/account.js"></script>
 </head>
 
 <body>
@@ -36,29 +34,36 @@
 
 <div class="container">
 
-    <!-- loop over the notifications -->
-    <?php if($this->notifications != null){
-        foreach($this->notifications as $notif) {?>
-            <p class="lead" style="color:green"><?php echo $notif ?></p>
-        <?php }}?>
 
-    <!-- let's not forget about the errors! -->
 
-    <?php if($this->errors != null){
-        foreach($this->errors as $error){ ?>
-            <p class="lead" style="color:red"><?php echo $error?></p>
+    <form class="form-signin" method="POST" action="index.php?action=resetPassword">
 
-        <?php }} ?>
+        <!-- loop over the notifications -->
+        <?php if($this->notifications != null){
+            foreach($this->notifications as $notif) {?>
+                <p class="lead" style="color:green"><?php echo $notif ?></p>
+            <?php }}?>
 
-    <p>
-        Don't worry, we can all forget sometimes. Enter your email address to recover the password associate with your account.
-    </p>
+        <!-- let's not forget about the errors! -->
 
-    <fieldset class="form-signin" method="POST" action="index.php?action=startpasswordrecovery">
-        <label for="inputMail" class="sr-only">Email*</label>
-        <input type="text" name="email" id="email" class="form-control" placeholder="Mail" required autofocus>
-        <button onclick="recoverPassword()">Recover</button>
-    </fieldset>
+        <?php if($this->errors != null){
+            foreach($this->errors as $error){ ?>
+                <p class="lead" style="color:red"><?php echo $error?></p>
+
+            <?php }} ?>
+
+        <h2 class="form-signin-heading">Reset your password!</h2>
+
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
+        <label for="repeatPassword" class="sr-only">Repeat password</label>
+        <!-- javascript can check this on the fly -->
+        <!-- colour it red if !match -->
+        <input type="password" name="repeatPassword" id="repeatPassword" class="form-control" placeholder="Repeat password" required/>
+
+        <input type="submit" class="btn btn-lg btn-primary btn-block" value="Reset">
+
+    </form>
 </div>
 <!-- /container -->
 

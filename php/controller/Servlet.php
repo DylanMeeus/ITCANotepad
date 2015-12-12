@@ -209,6 +209,12 @@ class Servlet
         elseif($action == "startpasswordrecovery")
         {
             $nextPage = $this->startPasswordRecovery();
+            $this->redirect=false;
+        }
+        elseif($action == "gotorecoverpassword")
+        {
+             $nextPage = $this->gotoRecoverPassword();
+
         }
         elseif($action == "isuniqueusername"){
             // Pass username back as a string? well if we have one, not unique.
@@ -297,10 +303,24 @@ class Servlet
     public function startPasswordRecovery()
     {
 
-        $mail = $_POST['email'];
-        $this->facade->startPasswordRecovery($mail);
-        // push success / failure as a notification;
-        return "home.php";
+        $mail = $_GET['email'];
+        $result = $this->facade->startPasswordRecovery($mail);
+        if(!$result)
+        {
+            // print  the error
+            array_push($this->errors, "Could not find an account with that email");
+            echo "forgotpassword.php";
+        }
+       echo $result;
     }
 
+    private function gotoRecoverPassword()
+    {
+        // We need to filter out some data from the recoveryID string
+        $recoveryString = $_GET['recoveryid'];
+
+        echo $recoveryString;
+
+  //      return "passwordrecovery.php";
+    }
 }
