@@ -17,7 +17,7 @@ class Servlet
     private $note;
     private $redirect;
     private $notelinks;
-
+    private $recoveryData;
     // We need to get rid of saying "Echo" in the servlet. ECHO == UI stuff; out with that demon here!
     private $errors = array(); // Logs the errors that occur -> each page loops over this array to see if it needs to display something
     private $notifications = array(); // Logs the notifications (They can be seen as 'successes' as opposed to 'errors'.
@@ -214,7 +214,10 @@ class Servlet
         elseif($action == "gotorecoverpassword")
         {
              $nextPage = $this->gotoRecoverPassword();
-
+        }
+        elseif($action == "resetPassword")
+        {
+            $nextPage = $this->resetPassword();
         }
         elseif($action == "isuniqueusername"){
             // Pass username back as a string? well if we have one, not unique.
@@ -231,8 +234,30 @@ class Servlet
 
         if ($this->redirect)
         {
+            // To have a better system for sending notifications, it might be good to check in the GET method for a standard param such as 'notif' or 'error'
+            $this->populateErrors();
+            $this->populateNotifications();
             require_once("web/" . $nextPage);
         }
+    }
+
+    private function populateNotifications()
+    {
+        if(isset($_GET['notif']))
+        {
+            $notificationMessage = $_GET['notif'];
+            switch($notificationMessage)
+            {
+                case "recoverysend":
+                    array_push($this->notifications, "Recovery mail send successfully!");
+                    break;
+            }
+        }
+    }
+
+    private function populateErrors()
+    {
+
     }
 
     private function isUniqueUsername()
@@ -316,11 +341,36 @@ class Servlet
 
     private function gotoRecoverPassword()
     {
-        // We need to filter out some data from the recoveryID string
-        $recoveryString = $_GET['recoveryid'];
+        // We need to filter out some data fr
+        $this->recoveryData = $_GET["recoveryid"];
+        echo "Data " . $this->recoveryData;
+        return "passwordrecovery.php";
+    }
 
-        echo $recoveryString;
-
-  //      return "passwordrecovery.php";
+    private function resetPassword()
+    {
+        if(isset($_POST['inputPassword']))
+        {
+            $inputPassword = $_POST['inputPassword'];
+            $repeatPassword = $_POST['repeatPassword'];
+            $recoveryString = $_POST['recoverydata'];
+            echo "input: " . $inputPassword . "repeat: " . $repeatPassword . " recovery: " . $recoveryString;
+            if($inputPassword == $repeatPassword)
+            {
+                // Reset the users password. We can filter the recoveryString when we need to.
+                if($this->facade->resetPassword($inputPassword,$recoveryString))
+                {
+                    array_push($this->notifications,"Password successfully reset.");
+                }
+                else
+                {
+                    array_push($this->errors, "It seems like your password recovery attempt failed. Please start a new one");
+                }
+                return "home.php";
+            }
+        }
+        array_push($this->errors,"Password fields need to match and can not be empty.");
+        return "passwordrecovery.php";
+        // If we reached this, we have an error somewhere.
     }
 }

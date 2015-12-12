@@ -532,7 +532,7 @@ class OnlineDB implements IDatabase
         {
             return false; // ?o user was found with this mail.
         }
-        $recoveryString = $userID.'-'.$recoveryString;
+        $recoveryString = $userID.'-'.$recoveryString; // add userID for uniqueness. the - was superfluous due to the ID being stored in the table though.
         $this->openConnection();
         $sql = "insert into passwordrecovery(userID, recoverystring) values (?,?)";
         $statement = $this->con->prepare($sql);
@@ -541,6 +541,45 @@ class OnlineDB implements IDatabase
         $statement->execute();
         $this->closeConnection();
         return $recoveryString;
+    }
+
+    public function resetPassword($password,$recoveryString)
+    {
+        // first we make sure that there is an entry in the password recovery table.
+        // Make sure to clean up the database after the password was reset so the link can not be used twice.
+
+        $userID = -1;
+
+        $this->openConnection();
+
+        $sql = "select * from passwordrecovery where recoverystring = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1,$recoveryString);
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $statement->execute();
+        $results = $statement->fetchAll();
+        foreach($results as $row)
+        {
+            $userID = $row['userID'];
+        }
+
+        if($userID==-1)
+        {
+            return false;
+        }
+        $this->closeConnection(); // We have to close the connection here so the next method does not cause problems with the database.
+        $this->changepassword($userID,$password);
+
+
+        $this->openConnection();
+
+        $sql = "delete from passwordrecovery where userID = ?"; // We use userID so all recovery attempts of this user are removed. We don't want them dangling around (security issues).
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1,$userID);
+        $statement->execute();
+        $this->closeConnection();
+        // If we have a user we can now update his password AND remove this record from the database.
+        return true;
     }
 
     private function getIDFromMail($mail)

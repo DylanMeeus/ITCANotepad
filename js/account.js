@@ -63,12 +63,14 @@ function recoverPassword()
                             'autotext': 'true',
                             'subject': '++Notepad password recovery.',
                             'html': "It seems like you have lost your password to www.it-ca.net/notepad. But, fear not for help is here! Follow this link to recover your password. " +
-                            "www.it-ca.net/notepad/index.php?action=gotorecoverpassword&recoveryid="+result+". "
+                            "www.it-ca.net/notepad/index.php?action=gotorecoverpassword&recoveryid="+result //adding a point at the end of this will cause errors with the 'RecoveryString'
                         }
                     }
                 }).done(function(response) {
-                    console.log(response); // if you're into that sorta thing
+                    // We can now redirect the user to the homepage.
+                    window.location = "index.php?action=gotologin&notif=recoverysend";
                 });
+
             }
         });
 

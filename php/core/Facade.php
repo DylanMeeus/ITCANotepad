@@ -110,6 +110,14 @@ class Facade
         return $this->database->createPasswordRecovery($mail, $recoveryString);
     }
 
+    /*
+     * Returns true if the password could successfully be recovered.
+     */
+    public function resetPassword($password,$recoveryString)
+    {
+        return $this->database->resetPassword($password,$recoveryString);
+    }
+
     /* Leave private functions at the bottom */
     private function encrypt($inputtext)
     {
@@ -121,6 +129,7 @@ class Facade
         // we can just return another MD5 I think.
         return  md5(microtime().rand());
     }
+
 
 }
 

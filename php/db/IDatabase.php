@@ -20,10 +20,10 @@ interface IDatabase
     public function deleteLink($linkID);
     public function changePassword($userID, $newpassword);
     public function verifyPassword($userID, $password);
+    public function resetPassword($password,$recoveryString); // We will only reset it if the recovery string was present in the database. The ID we can filter out of the recoveryString.
     public function addAPIKey($userID, $key);
     public function getUsersAPIKey($userID);
     public function isUniqueUsername($username);
     public function createPasswordRecovery($mail, $recoveryString); // Generates the unique ID used to recover somebodies password.
 }
-// CGI
 ?>

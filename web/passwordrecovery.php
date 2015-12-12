@@ -52,10 +52,12 @@
 
             <?php }} ?>
 
+        <input type="hidden" id="recoverydata" name="recoverydata" value="<?php echo $this->recoveryData?>"/>
+
         <h2 class="form-signin-heading">Reset your password!</h2>
 
         <label for="inputPassword" class="sr-only">Password</label>
-        <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
+        <input type="password" id="inputPassword" name="inputPassword" class="form-control" placeholder="Password" required>
         <label for="repeatPassword" class="sr-only">Repeat password</label>
         <!-- javascript can check this on the fly -->
         <!-- colour it red if !match -->
