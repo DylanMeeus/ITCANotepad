@@ -14,7 +14,7 @@ interface IDatabase
     public function getSharedNotes($userID);
     public function deleteNote($noteID);
     public function updateNote($noteID, $noteTitle, $noteText, $colour);
-    public function register($username,$password);
+    public function register($username,$password, $mail);
     public function getLinks($noteID);
     public function saveLink($noteID, $linkurl, $linkname);
     public function deleteLink($linkID);
@@ -23,6 +23,7 @@ interface IDatabase
     public function addAPIKey($userID, $key);
     public function getUsersAPIKey($userID);
     public function isUniqueUsername($username);
+    public function createPasswordRecovery($mail, $recoveryString); // Generates the unique ID used to recover somebodies password.
 }
 // CGI
 ?>

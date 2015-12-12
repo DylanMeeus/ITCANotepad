@@ -39,6 +39,7 @@ function setupPage()
 
     $("#notelist").hide().fadeIn(1500);
     // apply fade-in to the other div?
+    noteLookup();
 }
 
 function addUser(){
@@ -244,8 +245,7 @@ function noteLookup(){
             type: "GET",
             url: "index.php?action=notelookup&word=" + note,
             error: function (xhr, ajaxOptions, thrownError) {
-                alert(xhr.status);
-                alert(thrownError);
+                // don't push errors to the user like this.
             },
             success: function (result) {
                 setTimeout(function(){noteLookup();}, 3000);

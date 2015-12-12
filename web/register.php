@@ -68,7 +68,7 @@
   <!--      <label for="inputToken" class="sr-only">Token</label>
         <input type="text" name="token" id="inputToken" class="form-control" placeholder="Token" required>-->
         <label for="inputMail" class="sr-only">Email*</label>
-        <input type="text" name="mail" id="mail" class="form-control" placeholder="Mail" autofocus>
+        <input type="text" name="email" id="email" class="form-control" placeholder="Mail" autofocus>
         <input type="submit" class="btn btn-lg btn-primary btn-block" value="Create">
     </form>
 

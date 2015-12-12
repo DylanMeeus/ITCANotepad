@@ -236,19 +236,21 @@ class OnlineDB implements IDatabase
         return $id;
     }
 
-    public function register($username, $password)
+    public function register($username, $password, $mail)
     {
         $lastID = $this->getLastUserID();
         $this->openConnection();
-        $sql = "insert into users(username,password) values(?,?)";
+        $sql = "insert into users(username,password, email) values(?,?,?)";
         $statement = $this->con->prepare($sql);
         $statement->bindParam(1, $username);
         $statement->bindParam(2, $password);
+        $statement->bindParam(3, $mail);
         $statement->execute();
         $this->closeConnection();
         $user = new User();
         $user->setID($lastID + 1);
         $user->setUsername($username);
+        $user->setEmail($mail);
         return $user;
     }
 
@@ -520,6 +522,43 @@ class OnlineDB implements IDatabase
         }
         $this->closeConnection();
         return $unique;
+    }
 
+    public function createPasswordRecovery($mail, $recoveryString)
+    {
+        // First look for email; then create entry if it was found.
+        $userID = $this->getIDFromMail($mail);
+        if($userID==-1)
+        {
+            return false; // ?o user was found with this mail.
+        }
+        $recoveryString = $userID.$recoveryString;
+        $this->openConnection();
+        $sql = "insert into passwordrecovery(userID, recoverystring) values (?,?)";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1,$userID);
+        $statement->bindParam(2,$recoveryString);
+        $statement->execute();
+        $this->closeConnection();
+        return true;
+    }
+
+    private function getIDFromMail($mail)
+    {
+        $this->openConnection();
+
+        $sql = "select * from users where email = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1,$mail);
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $statement->execute();
+        $results = $statement->fetchAll();
+        $id = -1;
+        foreach($results as $row)
+        {
+            $id = $row['id'];
+        }
+        $this->closeConnection();
+        return $id;
     }
 }

@@ -27,6 +27,8 @@
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+    <script type="text/javascript" src="js/account.js"></script>
 </head>
 
 <body>
@@ -34,40 +36,28 @@
 
 <div class="container">
 
-
-
-    <form class="form-signin" method="POST" action="index.php?action=login">
-
-        <!-- loop over the notifications -->
-        <?php if($this->notifications != null){
-            foreach($this->notifications as $notif) {?>
-                <p class="lead" style="color:green"><?php echo $notif ?></p>
+    <!-- loop over the notifications -->
+    <?php if($this->notifications != null){
+        foreach($this->notifications as $notif) {?>
+            <p class="lead" style="color:green"><?php echo $notif ?></p>
         <?php }}?>
 
-        <!-- let's not forget about the errors! -->
+    <!-- let's not forget about the errors! -->
 
-        <?php if($this->errors != null){
-            foreach($this->errors as $error){ ?>
+    <?php if($this->errors != null){
+        foreach($this->errors as $error){ ?>
             <p class="lead" style="color:red"><?php echo $error?></p>
 
         <?php }} ?>
 
-        <h2 class="form-signin-heading">Notes inside!</h2>
+    <p>
+        Don't worry, we can all forget sometimes. Enter your email address to recover the password associate with your account.
+    </p>
 
-        <label for="inputEmail" class="sr-only">Username</label> <input type="text" name="username" id="username" class="form-control"
-                                                                             placeholder="Username" required autofocus> <label for="inputPassword" class="sr-only">Wachtwoord</label> <input type="password" name="password"
-                                                                                                                                                                                                  id="inputPassword" class="form-control" placeholder="Password" required>
-
-        <div class="checkbox">
-            <label>
-                <input name="rememberme" id="rememberID" type="checkbox" value="remember-me"> Remember me
-            </label>
-        </div>
-
-        <input type="submit" class="btn btn-lg btn-primary btn-block" value="Login">
-
-        <a href="index.php?action=gotoregister">Register</a>
-        <a href="index.php?action=gotoforgotpassword">Forgot password?</a>
+    <form class="form-signin" method="POST" action="index.php?action=startpasswordrecovery">
+        <label for="inputMail" class="sr-only">Email*</label>
+        <input type="text" name="email" id="email" class="form-control" placeholder="Mail" required autofocus>
+        <input type="submit" class="btn btn-lg btn-primary btn-block" value="Create">
     </form>
 </div>
 <!-- /container -->

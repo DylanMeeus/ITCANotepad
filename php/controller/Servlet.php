@@ -135,10 +135,17 @@ class Servlet
         {
             $username = $_POST['username'];
             $pass = $_POST['password'];
+            $mail = "";
+            if(isset($_POST['email']))
+            {
+                $mail = $_POST['email'];
+            }
+
+
             $token = $_POST['token'];
 
             // We don't need to use the token anymore. Anyone can register now.
-            $user = $this->facade->register($username, $pass);
+            $user = $this->facade->register($username, $pass, $mail);
             $_SESSION['user'] = $user;
             $nextPage = "notes.php";
             /*
@@ -194,6 +201,14 @@ class Servlet
         {
             $this->generateAPIKey();
             $this->redirect = false;
+        }
+        elseif($action == "gotoforgotpassword")
+        {
+            $nextPage = "forgotpassword.php";
+        }
+        elseif($action == "startpasswordrecovery")
+        {
+            $nextPage = $this->startPasswordRecovery();
         }
         elseif($action == "isuniqueusername"){
             // Pass username back as a string? well if we have one, not unique.
@@ -277,6 +292,15 @@ class Servlet
     public function gotoSharedNotes()
     {
         return "sharednotes.php";
+    }
+
+    public function startPasswordRecovery()
+    {
+
+        $mail = $_POST['email'];
+        $this->facade->startPasswordRecovery($mail);
+        // push success / failure as a notification;
+        return "home.php";
     }
 
 }
