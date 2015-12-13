@@ -138,6 +138,7 @@ class Servlet
 
         }elseif ($action == "savenote")
         {
+            $this->facade->cipher("Hey, Hello World!");
             $noteID = $_POST['noteid'];
             $textData = $_POST['textData'];
             $titleData = $_POST['titleData'];
@@ -312,6 +313,10 @@ class Servlet
         {
             $nextPage = $this->resetPassword();
         }
+        elseif($action == "cipher")
+        {
+            $nextPage = $this->cipher();
+        }
         elseif($action == "isuniqueusername"){
             // Pass username back as a string? well if we have one, not unique.
             // echo back false/true? Maybe easiest.
@@ -439,6 +444,8 @@ class Servlet
         echo "Data " . $this->recoveryData;
         return "passwordrecovery.php";
     }
+
+
 
     private function resetPassword()
     {

@@ -1,16 +1,23 @@
 <?php
 
+
+require_once "php/crypto/ICipher.php";
+require_once "php/crypto/PolyalphabeticCipher.php";
 require_once "php/db/OnlineDB.php";
 require_once "php/db/IDatabase.php";
 require_once "php/factories/DBFactory.php";
+require_once "php/factories/CipherFactory.php";
 class Facade
 {
     private $database;
     private $dbFactory;
+    private $cipher;
     public function __construct()
     {
         $this->dbFactory = new DBFactory();
         $this->database = $this->dbFactory->getDatabase();
+        $this->cipherFactory = new CipherFactory();
+        $this->cipher = $this->cipherFactory->getPolyalphabeticCipher();
     }
 
     public function login($username, $password)
@@ -144,6 +151,11 @@ class Facade
     public function resetPassword($password,$recoveryString)
     {
         return $this->database->resetPassword($this->encrypt($password),$recoveryString);
+    }
+
+    public function cipher($message)
+    {
+        $this->cipher->cipher($message);
     }
 
     /* Leave private functions at the bottom */
