@@ -173,6 +173,15 @@ class Servlet
             $this->notelinks = null;
             $nextPage = "notepage.php";
         }
+        elseif($action == "getUsers") {
+            $users = $this->facade->getUsers();
+            $usernames = array();
+            foreach ($users as $user) {
+                array_push($usernames, $user->getUsername());
+            }
+            echo json_encode($usernames);
+            $this->redirect = false;
+        }
         elseif ($action == "gotonotelist")
         {
             $user = $_SESSION["user"];

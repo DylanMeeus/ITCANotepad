@@ -43,7 +43,7 @@ function setupPage()
 }
 
 function addUser(){
-    var usernames = {};
+    var usernames;
     $.ajax({
         url:"index.php?action=getUsers",
         type:"GET",
@@ -60,14 +60,26 @@ function addUser(){
 
             var responseString = response;
             var escapedString = responseString.substring(1,responseString.length-1).replace(/(['"])/g, "");
-            var usernames = escapedString.split(",");
+            usernames = escapedString.split(",");
+            ++sharedUsers;
+            var txt = $("<input/>");
+            var label = $("<label/>");
 
-            /*var usernameData = data.split("@@");
-            alert(usernameData);
-            for(var i = 0; i < usernames.size(); i++){
-                alert(usernameData[i]);
-                usernames.push(usernameData[i]);
+            label.text("User " + sharedUsers + ":");
+            var usernameList = $("<datalist/>");
+            usernameList.attr("id", "usernames");
+
+            /*for(var i = 0; i < usernames.size(); i++){
+                usernameList.append($("<option></option>")
+                    .attr("value", usernames[i])
+                    .text(usernames[i]));
             }*/
+            txt.attr("type", "text");
+           // txt.attr("list", "usernames");
+            txt.attr("id", "user" + sharedUsers);
+            txt.attr("name", "user" + sharedUsers);
+            $("#users").append(label)
+                .append(txt);
 
         },
         complete: function(response)
@@ -77,24 +89,8 @@ function addUser(){
         }
     });
 
-    /*var user = false;
-    for(var i = 0; !user; i++) {
-        var test = "username" + i;
-        var result = $('#username' + i).val();
-        users[i] = result;
-        if(result == "" ){
-         user = true;
-         }
-       alert(users[i]);
-        user = true;
-    }*/
 
 
-    ++sharedUsers;
-    var txt = $("<input/>");
-    var label = $("<label/>");
-
-    label.text("User " + sharedUsers + ":");
     var select = $("<select/>");
 
 
@@ -108,14 +104,7 @@ function addUser(){
         .attr("selected", "selected")
         .text("Read/Write"));
 
-
-
-    txt.attr("type", "text");
-    txt.attr("id", "user" + sharedUsers);
-    txt.attr("name", "user" + sharedUsers);
-        $("#users").append(label)
-            .append(txt)
-            .append(select)
+        $("#users").append(select)
             .append("&nbsp;");
         if (sharedUsers % 3 == 0) {
             var br = $("<br/>");
