@@ -268,18 +268,8 @@ class Servlet
         } elseif ($action == "changePassword")
         {
             $nextPage = $this->changePassword();
-        } elseif($action == "getUsers"){
-            $users = $this->facade->getUsers();
-            $usernames = array();
-            foreach($users as $user){
-                array_push($usernames, $user->getUsername());
-            }
-            echo json_encode($usernames);
-            $this->redirect = false;
         } elseif ($action == "gotoSharedNotes")
         {
-
-           // $_GET['users'] = $users;
             $user = $_SESSION["user"];
             $this->notes = $this->facade->getSharedNotes($user->getID());
             $nextPage = $this->gotoSharedNotes();

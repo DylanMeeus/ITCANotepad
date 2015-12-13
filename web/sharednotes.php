@@ -79,7 +79,7 @@
     <input type="button" class="btn btn-lg btn-primary btn-block" value="New shared note" onclick="newnotepopup()">
     <br/>
     <div class="clearfix">
-        <input type="text" id="lookup" />
+       <label>Search: <input type="text" id="lookup" /></label>
     </div>
     <br/>
     <div id="newnotediv">
@@ -103,8 +103,8 @@
     <div id="notelist">
         <?php  if($this->notes != null){ foreach ($this->notes as $note) {
             ?>
-           <p><a style="color:#<?php echo $note->getColour()?>" class="notelink" href=<?php echo "index.php?action=opensharednote&noteid=" . $note->getID()?>> <?php echo  $note->getTitle() ?></a> Owner:
-            <a class="deletenote" href=<?php echo "index.php?action=deletesharednote&noteid=" . $note->getID()?>> x</a></p>
+           <p><a style="color:#<?php echo $note->getColour()?>" class="notelink" href=<?php echo "index.php?action=opensharednote&noteid=" . $note->getID()?>> <?php echo  $note->getTitle() ?></a> Owner: <?php echo $note->getSharedUsers()[0]->getUsername() ?>
+            <?php if($_SESSION["user"]->getID() == $note->getSharedUsers()[0]->getID()){ ?><a class="deletenote" href=<?php echo "index.php?action=deletesharednote&noteid=" . $note->getID()?>> x</a></p><?php } ?>
             </br>
             <?php
         }} ?>

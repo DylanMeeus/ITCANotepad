@@ -23,10 +23,12 @@ class Facade
     {
         return $this->database->getNotes($userID);
     }
-
     public function getSharedNotes($userID)
     {
         return $this->database->getSharedNotes($userID);
+    }
+    public function deleteSharedUser($userID, $noteID){
+        $this->database->deleteSharedUser($userID, $noteID);
     }
 
     public function getSharedNoteDetails($noteID)
@@ -41,9 +43,13 @@ class Facade
     public function deleteSharedNote($noteID){
         $this->database->deleteSharedNote($noteID);
     }
+    public function addSharedUsers($noteID, $users, $rightIDList){
+        $this->database->addSharedUsers($noteID, $users, $rightIDList);
+    }
 
-    public function getUserDetails($userID){
-        return $this->database->getUserDetails($userID);
+    public function addSharedNote($userID, $users, $title, $rightIDList)
+    {
+        return $this->database->addSharedNote($userID, $users, $title, $rightIDList);
     }
 
     public function getUsers(){
@@ -70,15 +76,10 @@ class Facade
         return $this->database->addNote($userID, $noteTitle);
     }
 
-    public function addSharedNote($userID, $users, $title, $rightIDList)
-    {
-        return $this->database->addSharedNote($userID, $users, $title, $rightIDList);
-    }
-
-    public function register($username, $password) // return instance of new user - perform some null checks in servlet though.
+    public function register($username, $password, $mail) // return instance of new user - perform some null checks in servlet though.
     {
         $encryptedPass = $this->encrypt($password);
-        return $this->database->register($username, $encryptedPass);
+        return $this->database->register($username, $encryptedPass, $mail);
     }
 
     public function savelink($noteID, $linkurl, $linkname)
@@ -119,7 +120,7 @@ class Facade
         while(!$this->database->addAPIKey($userID, $key))
         {
             // keep retrying till it works.
-            $key = md5(microtime().rand()); // We will perform some collision checking, but collisions are EXTREMELY rare?
+            $key = $this->generateRandomString();// We will perform some collision checking, but collisions are EXTREMELY rare?
         }
         // When we got here - we actually KNOW that the key got set correctly. (Otherwise, we'd be stuck in a while loop)
         // So we can safely return the key
@@ -131,11 +132,36 @@ class Facade
         return $this->database->isUniqueUsername($username);
     }
 
+    /*
+     * Returns the recoveryString if the mail was found. False otherwise.
+     */
+    public function startPasswordRecovery($mail)
+    {
+        // TODO: check for a collision here.
+        $recoveryString = $this->generateRandomString();
+        return $this->database->createPasswordRecovery($mail, $recoveryString);
+    }
+
+    /*
+     * Returns true if the password could successfully be recovered.
+     */
+    public function resetPassword($password,$recoveryString)
+    {
+        return $this->database->resetPassword($password,$recoveryString);
+    }
+
     /* Leave private functions at the bottom */
     private function encrypt($inputtext)
     {
         return sha1($inputtext);
     }
+
+    private function generateRandomString()
+    {
+        // we can just return another MD5 I think.
+        return  md5(microtime().rand());
+    }
+
 
 }
 

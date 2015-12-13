@@ -13,7 +13,6 @@ interface IDatabase
     public function addSharedNote($userID, $users, $title, $rightIDList);
     public function addSharedUsers($noteID, $users, $rightIDList);
     public function deleteSharedUser($userID, $noteID);
-    public function getUsers();
     public function deleteSharedNote($noteID);
     public function getSharedNotes($userID);
     public function getSharedNoteDetails($noteID);

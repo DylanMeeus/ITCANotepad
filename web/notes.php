@@ -34,7 +34,7 @@
     <![endif]-->
 </head>
 
-<body onload="setupPage(), noteLookup()">
+<body onload="setupPage()">
 
 
 <div class="container">
@@ -80,7 +80,7 @@
     <input type="button" class="btn btn-lg btn-primary btn-block" value="New note" onclick="newnotepopup()">
     <br/>
     <div class="clearfix">
-        <input type="text" id="lookup" />
+        <label>Search: <input type="text" id="lookup" /></label>
 
     </div>
     <br/>
