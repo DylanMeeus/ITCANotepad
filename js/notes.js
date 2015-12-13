@@ -39,6 +39,7 @@ function setupPage()
 
     $("#notelist").hide().fadeIn(1500);
     // apply fade-in to the other div?
+    noteLookup();
 }
 
 function addUser(){

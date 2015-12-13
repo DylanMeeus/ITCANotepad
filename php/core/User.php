@@ -8,9 +8,20 @@ class User
     private $id;
     private $username;
     private $apikey;
+    private $email;
     public function __construct()
     {
         $this->apikey = "0xDEAD"; // not all people will have an API key, so this value indicates that someone doesn't have it
+    }
+
+    public function setEmail($mail)
+    {
+        $this->email = $mail;
+    }
+
+    public function getEmail()
+    {
+        return $this->email;
     }
 
     public function setID($userid)

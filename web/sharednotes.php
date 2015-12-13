@@ -73,7 +73,7 @@
     <input type="button" class="btn btn-lg btn-primary btn-block" value="New shared note" onclick="newnotepopup()">
     <br/>
     <div class="clearfix">
-        <input type="text" id="lookup" />
+       <label>Search: <input type="text" id="lookup" /></label>
     </div>
     <br/>
     <div id="newnotediv">

@@ -17,10 +17,9 @@ class Servlet
     private $note;
     private $redirect;
     private $notelinks;
+    private $recoveryData;
     //true: shows extra partials needed for options for shared notes
     private $shared;
-
-
     // We need to get rid of saying "Echo" in the servlet. ECHO == UI stuff; out with that demon here!
     private $errors = array(); // Logs the errors that occur -> each page loops over this array to see if it needs to display something
     private $notifications = array(); // Logs the notifications (They can be seen as 'successes' as opposed to 'errors'.
@@ -97,7 +96,6 @@ class Servlet
             }
         } elseif ($action == "opennote")
         {
-            $this->shared = false;
             $noteID = $_GET['noteid'];
             $_POST['noteid'] = $noteID; // get it async using jquery and writing a new query, or just loop here?
 
@@ -112,9 +110,9 @@ class Servlet
             } else
             {
                 $nextPage = "errorpage.php";
-                //test
             }
-        } elseif ($action == "opensharednote")
+        }
+        elseif ($action == "opensharednote")
         {
             $this->shared = true;
             $noteID = $_GET['noteid'];
@@ -138,9 +136,7 @@ class Servlet
                 $nextPage = "errorpage.php";
             }
 
-        }
-
-        elseif ($action == "savenote")
+        }elseif ($action == "savenote")
         {
             $noteID = $_POST['noteid'];
             $textData = $_POST['textData'];
@@ -155,7 +151,7 @@ class Servlet
             $this->note = $this->facade->addNote($user->getID(), $title);
             $this->notelinks = null;
             $nextPage = "notepage.php";
-        } elseif ($action == "createsharednote") {
+        }elseif ($action == "createsharednote") {
             $this->shared = true;
             $title = $_POST['newnotetitle'];
             $user = $_SESSION["user"];
@@ -169,8 +165,7 @@ class Servlet
                     array_push($users, $shareduser);
                     $rightID = $_POST['rightID' . $i];
                     array_push($rightIds, $rightID);
-                }
-                else {
+                } else {
                     $lastuser = true;
                 }
             }
@@ -190,9 +185,17 @@ class Servlet
         {
             $username = $_POST['username'];
             $pass = $_POST['password'];
+            $mail = "";
+            if(isset($_POST['email']))
+            {
+                $mail = $_POST['email'];
+            }
+
+
+            $token = $_POST['token'];
 
             // We don't need to use the token anymore. Anyone can register now.
-            $user = $this->facade->register($username, $pass);
+            $user = $this->facade->register($username, $pass, $mail);
             $_SESSION['user'] = $user;
             $nextPage = "notes.php";
             /*
@@ -221,13 +224,6 @@ class Servlet
             $user = $_SESSION['user'];
             $this->notes = $this->facade->getSharedNotes($user->getID());
             $nextPage = $this->gotoSharedNotes();
-        } elseif($action == "deleteuser"){
-            $userID = $_GET['userid'];
-            $noteID = $_GET['noteid'];
-            $this->facade->deleteSharedUser($userID, $noteID);
-            $this->note = $this->facade->getSharedNoteDetails($noteID);
-            $this->shared = true;
-            $nextPage = "notepage.php";
         } elseif($action == "addsharedusers"){
             $noteID = $_POST['noteID'];
             $users = array();
@@ -277,12 +273,7 @@ class Servlet
             $user = $_SESSION["user"];
             $this->notes = $this->facade->getSharedNotes($user->getID());
             $nextPage = $this->gotoSharedNotes();
-        }
-        elseif($action == "gotochangepassword")
-        {
-            $nextPage = "changepassword.php";
-        }
-        elseif ($action == "notelookup")
+        }elseif ($action == "notelookup")
         {
             $word = $_GET['word'];
             if($word != null && $word != "") {
@@ -295,12 +286,36 @@ class Servlet
             }
             $this->redirect = false;
         }
+        elseif($action == "gotochangepassword")
+        {
+            $nextPage = "changepassword.php";
+        }
         elseif($action == "generateAPIkey")
         {
             $this->generateAPIKey();
             $this->redirect = false;
         }
+        elseif($action == "gotoforgotpassword")
+        {
+            $nextPage = "forgotpassword.php";
+        }
+        elseif($action == "startpasswordrecovery")
+        {
+            $nextPage = $this->startPasswordRecovery();
+            $this->redirect=false;
+        }
+        elseif($action == "gotorecoverpassword")
+        {
+             $nextPage = $this->gotoRecoverPassword();
+        }
+        elseif($action == "resetPassword")
+        {
+            $nextPage = $this->resetPassword();
+        }
         elseif($action == "isuniqueusername"){
+            // Pass username back as a string? well if we have one, not unique.
+            // echo back false/true? Maybe easiest.
+            // But do this in XML
 
             $this->isUniqueUsername();
             $this->redirect = false;
@@ -309,10 +324,33 @@ class Servlet
             $nextPage = "errorpage.php";
         }
 
+
         if ($this->redirect)
         {
+            // To have a better system for sending notifications, it might be good to check in the GET method for a standard param such as 'notif' or 'error'
+            $this->populateErrors();
+            $this->populateNotifications();
             require_once("web/" . $nextPage);
         }
+    }
+
+    private function populateNotifications()
+    {
+        if(isset($_GET['notif']))
+        {
+            $notificationMessage = $_GET['notif'];
+            switch($notificationMessage)
+            {
+                case "recoverysend":
+                    array_push($this->notifications, "Recovery mail send successfully!");
+                    break;
+            }
+        }
+    }
+
+    private function populateErrors()
+    {
+
     }
 
     private function isUniqueUsername()
@@ -326,10 +364,6 @@ class Servlet
             echo "false";
         }
 
-
-    }
-
-    private function goToSharedNotePage(){
 
     }
 
@@ -384,4 +418,52 @@ class Servlet
         return "sharednotes.php";
     }
 
+    public function startPasswordRecovery()
+    {
+
+        $mail = $_GET['email'];
+        $result = $this->facade->startPasswordRecovery($mail);
+        if(!$result)
+        {
+            // print  the error
+            array_push($this->errors, "Could not find an account with that email");
+            echo "forgotpassword.php";
+        }
+       echo $result;
+    }
+
+    private function gotoRecoverPassword()
+    {
+        // We need to filter out some data fr
+        $this->recoveryData = $_GET["recoveryid"];
+        echo "Data " . $this->recoveryData;
+        return "passwordrecovery.php";
+    }
+
+    private function resetPassword()
+    {
+        if(isset($_POST['inputPassword']))
+        {
+            $inputPassword = $_POST['inputPassword'];
+            $repeatPassword = $_POST['repeatPassword'];
+            $recoveryString = $_POST['recoverydata'];
+            echo "input: " . $inputPassword . "repeat: " . $repeatPassword . " recovery: " . $recoveryString;
+            if($inputPassword == $repeatPassword)
+            {
+                // Reset the users password. We can filter the recoveryString when we need to.
+                if($this->facade->resetPassword($inputPassword,$recoveryString))
+                {
+                    array_push($this->notifications,"Password successfully reset.");
+                }
+                else
+                {
+                    array_push($this->errors, "It seems like your password recovery attempt failed. Please start a new one");
+                }
+                return "home.php";
+            }
+        }
+        array_push($this->errors,"Password fields need to match and can not be empty.");
+        return "passwordrecovery.php";
+        // If we reached this, we have an error somewhere.
+    }
 }
