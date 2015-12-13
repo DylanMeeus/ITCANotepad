@@ -192,7 +192,7 @@ class Servlet
             }
 
 
-            $token = $_POST['token'];
+
 
             // We don't need to use the token anymore. Anyone can register now.
             $user = $this->facade->register($username, $pass, $mail);
