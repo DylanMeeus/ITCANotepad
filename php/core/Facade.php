@@ -143,7 +143,7 @@ class Facade
      */
     public function resetPassword($password,$recoveryString)
     {
-        return $this->database->resetPassword($password,$recoveryString);
+        return $this->database->resetPassword($this->encrypt($password),$recoveryString);
     }
 
     /* Leave private functions at the bottom */
