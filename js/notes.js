@@ -57,7 +57,10 @@ function addUser(){
                 var username = usernameData.usernameField;
                 found = true;
             }*/
-            alert(response);
+
+            var responseString = response;
+            var escapedString = responseString.substring(1,responseString.length-1).replace(/(['"])/g, "");
+            var usernames = escapedString.split(",");
 
             /*var usernameData = data.split("@@");
             alert(usernameData);
