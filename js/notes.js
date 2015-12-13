@@ -49,8 +49,8 @@ function addUser(){
         datatype:"json",
         success: function(response)
         {
-            var usernameData = JSON.parse(response);
-            var found = false;
+           // var usernameData = JSON.parse(response);
+          //  var found = false;
            /* while(!found){
                 var usernameField = username + i;
                 var username = usernameData.usernameField;

@@ -271,10 +271,8 @@ class Servlet
         } elseif($action == "getUsers"){
             $users = $this->facade->getUsers();
             $usernames = array();
-            $i = 1;
             foreach($users as $user){
-                $usernames['username' . $i] = $user->getUsername();
-                $i++;
+                array_push($usernames, $user->getUsername());
             }
             echo json_encode($usernames);
             $this->redirect = false;

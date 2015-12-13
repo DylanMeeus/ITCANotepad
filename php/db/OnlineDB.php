@@ -340,6 +340,34 @@ class OnlineDB implements IDatabase
 
     }
 
+    public function getUsers()
+    {
+        $this->openConnection();
+
+        $sql = "select * from users";
+
+        $statement = $this->con->prepare($sql);
+
+        $statement->execute();
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll();
+        $users = array();
+        foreach ($result as $row)
+        {
+            $user = new User();
+            $user->setID($row['id']);
+            $user->setUsername($row['username']);
+            $user->setAPIKey($row['apikey']);
+            array_push($users, $user);
+        }
+
+
+        $this->closeConnection();
+        return $users;
+
+
+    }
+
     public function getUserFromUsername($username)
     {
         // return user from username
