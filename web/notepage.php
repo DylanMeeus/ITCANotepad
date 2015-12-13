@@ -104,6 +104,13 @@
 
     <div id="notetextdiv"  class="form-group">
         <input style="font-size:25px" type="text" id="titleid" <?php echo "value=\"" . $this->note->getTitle() ."\""?>/>  <label>Colour:<input id="colourid" class="color"></label>
+        <?php if($this->shared){ ?>
+            <label>Shared users:</label>
+            <?php foreach($this->note->getSharedUsers() as $user){ echo $user->getUsername();
+                 if ($user->getID() != $this->note->getUserID() && $_SESSION["user"]->getID() == $this->note->getUserID()){ ?>
+        <a class="deleteuser" href=<?php echo "index.php?action=deleteuser&userid=" . $user->getID() . "&noteid=" . $this->note->getID() ?>> x</a>
+                 <?php }  ?> &nbsp;
+            <?php } } ?>
         </br>
         <label for="message"></label>
         <textarea class="form-control" rows="10" id="textid"><?php echo $this->note->getText() ?></textarea>
@@ -133,6 +140,18 @@
             <?php
         }} ?>
 </div>
+    <br/>
+    <?php if($this->shared){ ?>
+    <form id="userform" method="POST" action="index.php?action=addsharedusers">
+        <input type="hidden" id="noteID" name="noteID" <?php echo "value=\"" . $this->note->getID() . "\""?>/>
+    <div id="users">
+    </div>
+        <br/>
+        <input type="button" class="btn btn-default btn-primary" value="Add other user" onclick="addUser()"/>
+        <input type="submit" class="btn btn-default btn-primary" value="Confirm"/>
+    </form>
+        <?php
+    } ?>
         <!--
         THIS FAVICON STUFF DOES NOT WORK.
         <ul>

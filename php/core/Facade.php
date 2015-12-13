@@ -23,6 +23,34 @@ class Facade
     {
         return $this->database->getNotes($userID);
     }
+    public function getSharedNotes($userID)
+    {
+        return $this->database->getSharedNotes($userID);
+    }
+    public function deleteSharedUser($userID, $noteID){
+        $this->database->deleteSharedUser($userID, $noteID);
+    }
+
+    public function getSharedNoteDetails($noteID)
+    {
+        return $this->database->getSharedNoteDetails($noteID);
+    }
+
+    public function getUserFromUsername($username){
+        return $this->database->getUserFromUsername($username);
+    }
+
+    public function deleteSharedNote($noteID){
+        $this->database->deleteSharedNote($noteID);
+    }
+    public function addSharedUsers($noteID, $users, $rightIDList){
+        $this->database->addSharedUsers($noteID, $users, $rightIDList);
+    }
+
+    public function addSharedNote($userID, $users, $title, $rightIDList)
+    {
+        return $this->database->addSharedNote($userID, $users, $title, $rightIDList);
+    }
 
     public function getNoteDetails($noteID)
     {
