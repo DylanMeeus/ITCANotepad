@@ -7,13 +7,13 @@ class Note {
     private $title;
     private $text;
     private $colour;
-    //owner of note
     private $userID;
-    private $userIDList;
+    private $owner;
+    private $sharedusers;
 
     public function __construct()
     {
-        $this->userIDList = array();
+        $this->sharedusers = array();
     }
 
     public function getID(){return $this->id;}
@@ -21,12 +21,14 @@ class Note {
     public function getText(){return $this->text;}
     public function getColour(){return $this->colour;}
     public function getUserID(){return $this->userID;}
-    public function getUserIDList(){return $this->userIDList;}
+    public function getSharedUsers(){return $this->sharedusers;}
+    public function getOwner(){return $this->owner;}
 
+    public function setOwner($own){$this->owner = $own;}
     public function setID($noteid){$this->id = $noteid;}
     public function setTitle($t){$this->title = $t;}
     public function setText($t){$this->text=$t;}
     public function setColour($c){$this->colour = $c;}
     public function setUserID($id){$this->userID = $id;}
-    public function setUserIDList($list){$this->userIDList = $list;}
+    public function setSharedUsers($list){$this->sharedusers = $list;}
 }
