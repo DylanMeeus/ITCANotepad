@@ -46,6 +46,10 @@ class Facade
         return $this->database->getUserDetails($userID);
     }
 
+    public function getUsers(){
+        return $this->database->getUsers();
+    }
+
     public function getNoteDetails($noteID)
     {
         return $this->database->getNoteDetails($noteID);

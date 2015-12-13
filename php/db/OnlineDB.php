@@ -100,7 +100,7 @@ class OnlineDB implements IDatabase
     {
         $this->openConnection();
 
-        $sql = "select sharednoteID, sh.userID, rightID, title, notetext, colour from sharednotes sh JOIN notes n ON sharednoteID = noteID where sh.userID = ?";
+        $sql = "select sharednoteID, sh.userID as sharedID, rightID, title, notetext, colour, n.userID as ownerID from sharednotes sh JOIN notes n ON sharednoteID = noteID where sh.userID = ?";
 
         $statement = $this->con->prepare($sql);
         $statement->bindParam(1, $userID);
@@ -109,6 +109,7 @@ class OnlineDB implements IDatabase
         $result = $statement->fetchAll();
 
         $sharednotes = array();
+
         foreach ($result as $row)
         {
             $note = new Note();
@@ -116,17 +117,56 @@ class OnlineDB implements IDatabase
             $note->setTitle($row['title']);
             $note->setText($row['notetext']);
             $note->setColour($row['colour']);
-            $note->setUserID($row['userID']);
+            $note->setUserID($row['ownerID']);
 
+            $users = array();
             $user = new User();
-            $user->setID($row['userID']);
-            $username = $this->getUserDetails($row['userID'])->getUsername();
+            $user->setID($row['ownerID']);
+            $username = $this->getUserDetails($row['ownerID'])->getUsername();
             $user->setUsername($username);
-            array_push($note->getSharedUsers(), $user);
+            array_push($users, $user);
+            $note->setSharedUsers($users);
             array_push($sharednotes, $note);
         }
         $this->closeConnection();
         return $sharednotes;
+    }
+
+    /*public function deleteSharedNote($noteID)
+    {
+        $this->deleteNote($noteID);
+        $this->openConnection();
+        $sql = "delete from sharednotes where sharednoteID = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1, $noteID);
+        $statement->execute();
+        $this->closeConnection();
+    }*/
+
+    public function deleteSharedUser($userID, $noteID)
+    {
+        $this->openConnection();
+        $sql = "delete from sharednotes where sharednoteID = ? and userID = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1, $noteID);
+        $statement->bindParam(2, $userID);
+        $statement->execute();
+        $this->closeConnection();
+    }
+
+    public function addSharedUsers($noteID, $users, $rightIDList)
+    {
+        $this->openConnection();
+        for($i = 0; $i < sizeof($users);$i++){
+            $sql = "insert into sharednotes(sharednoteID,userID,rightID) values(?,?,?)";
+            $statement = $this->con->prepare($sql);
+            $statement->bindParam(1, $noteID);
+            $statement->bindParam(2, $users[$i]->getID());
+            $statement->bindParam(3, $rightIDList[$i]);
+            $statement->execute();
+        }
+
+        $this->closeConnection();
     }
 
     public function getNoteDetails($noteID)
@@ -174,6 +214,7 @@ class OnlineDB implements IDatabase
             $user->setUsername($username);
             array_push($users, $user);
         }
+        $notedetails->setSharedUsers($users);
         $notedetails->setSharedUsers($users);
         $this->closeConnection();
         return $notedetails;
@@ -239,8 +280,8 @@ class OnlineDB implements IDatabase
         $statement->setFetchMode(PDO::FETCH_ASSOC);
         $result = $statement->fetchAll();
 
-            foreach ($result as $row)
-            {
+        foreach ($result as $row)
+        {
             $id = $row['m'];
             break;
         }
@@ -249,19 +290,21 @@ class OnlineDB implements IDatabase
     }
 
 
-    public function register($username, $password)
+    public function register($username, $password, $mail)
     {
         $lastID = $this->getLastUserID();
         $this->openConnection();
-        $sql = "insert into users(username,password) values(?,?)";
+        $sql = "insert into users(username,password, email) values(?,?,?)";
         $statement = $this->con->prepare($sql);
         $statement->bindParam(1, $username);
         $statement->bindParam(2, $password);
+        $statement->bindParam(3, $mail);
         $statement->execute();
         $this->closeConnection();
         $user = new User();
         $user->setID($lastID + 1);
         $user->setUsername($username);
+        $user->setEmail($mail);
         return $user;
     }
 
@@ -446,7 +489,7 @@ class OnlineDB implements IDatabase
             }
             $this->closeConnection();
             $this->attachKeyToUser($userID, $lastKey);
-        //    return true; // We can just fall through end return true.
+            //    return true; // We can just fall through end return true.
         }
 
         return true; // if we got here without errors, we can return true.
@@ -467,7 +510,6 @@ class OnlineDB implements IDatabase
 
     public function addSharedNote($userID, $users, $title, $rightIDList)
     {
-
         $this->addNote($userID, $title);
 
         $lastID = $this->getLastNoteID();
@@ -481,8 +523,9 @@ class OnlineDB implements IDatabase
         $statement->execute();
         $newSharedNote = new Note();
         $newSharedNote->setID($lastID);
+        $newSharedNote->setUserID($userID);
         $newSharedNote->setTitle($title);
-        $newSharedNote->setSharedUsers($users);
+
 
 
         for($i = 0; $i < sizeof($users); $i++){
@@ -493,6 +536,9 @@ class OnlineDB implements IDatabase
             $statement->bindParam(3, $rightIDList[$i]);
             $statement->execute();
         }
+        $user = $this->getUserDetails($userID);
+        array_unshift($users, $user);
+        $newSharedNote->setSharedUsers($users);
 
         $this->closeConnection();
         return $newSharedNote;
@@ -525,7 +571,7 @@ class OnlineDB implements IDatabase
             $user->setID($row['id']);
             $user->setAPIKey($row['apikey']);
             $user->setUsername($row['username']);
-           break; // there can't be more than one user tbh; really want to do an explicit goto here in asm? mh.
+            break; // there can't be more than one user tbh; really want to do an explicit goto here in asm? mh.
         }
 
         $this->closeConnection();
@@ -569,5 +615,72 @@ class OnlineDB implements IDatabase
         $this->closeConnection();
         return $unique;
 
+    }
+
+    public function createPasswordRecovery($mail, $recoveryString)
+    {
+        // First look for email; then create entry if it was found.
+        $userID = $this->getIDFromMail($mail);
+        if($userID==-1)
+        {
+            return false; // ?o user was found with this mail.
+        }
+        $recoveryString = $userID.'-'.$recoveryString; // add userID for uniqueness. the - was superfluous due to the ID being stored in the table though.
+        $this->openConnection();
+        $sql = "insert into passwordrecovery(userID, recoverystring) values (?,?)";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1,$userID);
+        $statement->bindParam(2,$recoveryString);
+        $statement->execute();
+        $this->closeConnection();
+        return $recoveryString;
+    }
+    public function resetPassword($password,$recoveryString)
+    {
+        // first we make sure that there is an entry in the password recovery table.
+        // Make sure to clean up the database after the password was reset so the link can not be used twice.
+        $userID = -1;
+        $this->openConnection();
+        $sql = "select * from passwordrecovery where recoverystring = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1,$recoveryString);
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $statement->execute();
+        $results = $statement->fetchAll();
+        foreach($results as $row)
+        {
+            $userID = $row['userID'];
+        }
+        if($userID==-1)
+        {
+            return false;
+        }
+        $this->closeConnection(); // We have to close the connection here so the next method does not cause problems with the database.
+        $this->changepassword($userID,$password);
+        $this->openConnection();
+        $sql = "delete from passwordrecovery where userID = ?"; // We use userID so all recovery attempts of this user are removed. We don't want them dangling around (security issues).
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1,$userID);
+        $statement->execute();
+        $this->closeConnection();
+        // If we have a user we can now update his password AND remove this record from the database.
+        return true;
+    }
+    private function getIDFromMail($mail)
+    {
+        $this->openConnection();
+        $sql = "select * from users where email = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1,$mail);
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $statement->execute();
+        $results = $statement->fetchAll();
+        $id = -1;
+        foreach($results as $row)
+        {
+            $id = $row['id'];
+        }
+        $this->closeConnection();
+        return $id;
     }
 }

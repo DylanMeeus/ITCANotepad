@@ -33,6 +33,7 @@
 <body onload="setupPage()">
 
 
+
 <div class="container">
 
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -56,6 +57,11 @@
     </nav>
 
     </br></br></br>
+
+    <!--<?php
+   /* for($i = 0; $i < sizeof($_GET['users']);$i++){ ?>
+    <input type="hidden" id="username" . <?php echo $i; ?> value="<?php echo $_GET['users'][$i]->getUsername()?>"/>
+    <?php }?>--> */?>
 
     <!-- loop over the notifications -->
     <?php if($this->notifications != null){
@@ -92,6 +98,7 @@
 
 
     </div>
+
 
     <div id="notelist">
         <?php  if($this->notes != null){ foreach ($this->notes as $note) {

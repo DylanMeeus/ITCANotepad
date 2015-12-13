@@ -42,6 +42,50 @@ function setupPage()
 }
 
 function addUser(){
+    var usernames = {};
+    $.ajax({
+        url:"index.php?action=getUsers",
+        type:"GET",
+        datatype:"json",
+        success: function(response)
+        {
+            var usernameData = JSON.parse(response);
+            var found = false;
+           /* while(!found){
+                var usernameField = username + i;
+                var username = usernameData.usernameField;
+                found = true;
+            }*/
+            alert(response);
+
+            /*var usernameData = data.split("@@");
+            alert(usernameData);
+            for(var i = 0; i < usernames.size(); i++){
+                alert(usernameData[i]);
+                usernames.push(usernameData[i]);
+            }*/
+
+        },
+        complete: function(response)
+        {
+            // this just gets called when the ajax call is done. It's like the finally of a try-catch.
+             console.log(response);
+        }
+    });
+
+    /*var user = false;
+    for(var i = 0; !user; i++) {
+        var test = "username" + i;
+        var result = $('#username' + i).val();
+        users[i] = result;
+        if(result == "" ){
+         user = true;
+         }
+       alert(users[i]);
+        user = true;
+    }*/
+
+
     ++sharedUsers;
     var txt = $("<input/>");
     var label = $("<label/>");
