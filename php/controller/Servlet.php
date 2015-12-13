@@ -112,6 +112,7 @@ class Servlet
             } else
             {
                 $nextPage = "errorpage.php";
+                //test
             }
         } elseif ($action == "opensharednote")
         {
