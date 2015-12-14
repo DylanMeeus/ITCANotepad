@@ -43,6 +43,12 @@ Future releases
     - Remove mail (x)
     - Revoke API key (x)
 
+- Notepage changes
+    - filter HTTP(S)
+    - Favicon filter
+
+- Security
+    - AES pw
 
 
 The people
