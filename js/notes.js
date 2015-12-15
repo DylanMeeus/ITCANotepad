@@ -6,6 +6,8 @@
 
 var saved = true;
 var sharedUsers = 0;
+var datalist = false;
+var usernames;
 function setupNoteDetailPage()
 {
 
@@ -42,60 +44,36 @@ function setupPage()
     noteLookup();
 }
 
-function addUser(){
-    var usernames;
+function getUsernames(){
     $.ajax({
-        url:"index.php?action=getUsers",
-        type:"GET",
-        datatype:"json",
-        success: function(response)
-        {
-           // var usernameData = JSON.parse(response);
-          //  var found = false;
-           /* while(!found){
-                var usernameField = username + i;
-                var username = usernameData.usernameField;
-                found = true;
-            }*/
+        url: "index.php?action=getUsers",
+        type: "GET",
+        datatype: "json",
+        success: function (response) {
 
             var responseString = response;
-            var escapedString = responseString.substring(1,responseString.length-1).replace(/(['"])/g, "");
+            var escapedString = responseString.substring(1, responseString.length - 1).replace(/(['"])/g, "");
             usernames = escapedString.split(",");
-            ++sharedUsers;
-            var txt = $("<input/>");
-            var label = $("<label/>");
-
-            label.text("User " + sharedUsers + ":");
-            var usernameList = $("<datalist/>");
-            usernameList.attr("id", "usernames");
-
-            /*for(var i = 0; i < usernames.size(); i++){
-                usernameList.append($("<option></option>")
-                    .attr("value", usernames[i])
-                    .text(usernames[i]));
-            }*/
-            txt.attr("type", "text");
-           // txt.attr("list", "usernames");
-            txt.attr("id", "user" + sharedUsers);
-            txt.attr("name", "user" + sharedUsers);
-            $("#users").append(label)
-                .append(txt);
-
         },
-        complete: function(response)
-        {
+        complete: function (response) {
             // this just gets called when the ajax call is done. It's like the finally of a try-catch.
-             console.log(response);
+            console.log(response);
         }
     });
+}
 
+function addUser(){
+
+    ++sharedUsers;
+    var txt = $("<input/>");
+    var label = $("<label/>");
+
+    label.text("User " + sharedUsers + ":");
 
 
     var select = $("<select/>");
-
-
     select.attr("id", "rightID" + sharedUsers)
-    .attr("name", "rightID" + sharedUsers);
+        .attr("name", "rightID" + sharedUsers);
     select.append($("<option></option>")
         .attr("value",2)
         .text("Read"));
@@ -104,15 +82,34 @@ function addUser(){
         .attr("selected", "selected")
         .text("Read/Write"));
 
-        $("#users").append(select)
-            .append("&nbsp;");
-        if (sharedUsers % 3 == 0) {
-            var br = $("<br/>");
-            $("#users").append(br);
-        }
+    txt.attr("type", "text");
+    txt.attr("id", "user" + sharedUsers);
+    txt.attr("name", "user" + sharedUsers);
 
+    var usernameList = $("<datalist/>");
+    usernameList.attr("id", "usernames" + sharedUsers);
+
+    for (var i = 0; i < usernames.length; i++) {
+        usernameList.append($("<option></option>")
+            .attr("value", usernames[i])
+            .text(usernames[i]));
+    }
+
+    txt.attr("list", "usernames" + sharedUsers);
+    $("#users").append(usernameList)
+        .append(label)
+        .append(txt)
+        .append(select)
+        .append("&nbsp;");
+    if (sharedUsers % 3 == 0) {
+        var br = $("<br/>");
+        $("#users").append(br);
+    }
 }
 
+function returnUsernames(){
+
+}
 
 function saveLink()
 {

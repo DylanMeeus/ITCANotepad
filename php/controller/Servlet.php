@@ -116,14 +116,15 @@ class Servlet
         {
             $this->shared = true;
             $noteID = $_GET['noteid'];
-            $_POST['noteid'] = $noteID; // get it async using jquery and writing a new query, or just loop here?
+            $_POST['noteid'] = $noteID;
 
-            // does the note belong to this user?
             $user = $_SESSION["user"];
+
 
             $this->note = $this->facade->getSharedNoteDetails($noteID);
             $foundID = false;
             foreach($this->note->getSharedUsers() as $shareduser){
+
                 if ($shareduser->getID() == $user->getID())
                 {
                     $foundID = true;
@@ -176,8 +177,11 @@ class Servlet
         elseif($action == "getUsers") {
             $users = $this->facade->getUsers();
             $usernames = array();
+            $currentUser = $_SESSION["user"];
             foreach ($users as $user) {
-                array_push($usernames, $user->getUsername());
+                if($currentUser->getID() != $user->getID()){
+                    array_push($usernames, $user->getUsername());
+                }
             }
             echo json_encode($usernames);
             $this->redirect = false;
@@ -242,6 +246,7 @@ class Servlet
                 if (isset($_POST['user' . $i])) {
                     $sharedusername = $_POST['user' . $i];
                     $shareduser = $this->facade->getUserFromUsername($sharedusername);
+
                     array_push($users, $shareduser);
                     $rightID = $_POST['rightID' . $i];
                     array_push($rightIds, $rightID);

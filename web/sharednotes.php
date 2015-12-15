@@ -30,8 +30,7 @@
     <![endif]-->
 </head>
 
-<body onload="setupPage()">
-
+<body onload="setupPage(), getUsernames()">
 
 
 <div class="container">

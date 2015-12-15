@@ -34,7 +34,7 @@
     <script type="text/javascript" src="jscolor/jscolor.js"></script>
 </head>
 
-<body onload="setupNoteDetailPage()">
+<body onload="setupNoteDetailPage(), getUsernames()">
 
 
 <input type="hidden" id="noteID" <?php echo "value=\"" . $this->note->getID() . "\""?>/>
@@ -141,17 +141,19 @@
         }} ?>
 </div>
     <br/>
-    <?php if($this->shared){ ?>
-    <form id="userform" method="POST" action="index.php?action=addsharedusers">
-        <input type="hidden" id="noteID" name="noteID" <?php echo "value=\"" . $this->note->getID() . "\""?>/>
-    <div id="users">
-    </div>
+    <?php if($this->shared && $_SESSION["user"]->getID() == $this->note->getUserID()){ ?>
+    <div id="addusers">
+            <form id="userform" method="POST" action="index.php?action=addsharedusers">
+            <input type="hidden" id="noteID" name="noteID" <?php echo "value=\"" . $this->note->getID() . "\""?>/>
+        <div id="users">
+        </div>
         <br/>
         <input type="button" class="btn btn-default btn-primary" value="Add other user" onclick="addUser()"/>
         <input type="submit" class="btn btn-default btn-primary" value="Confirm"/>
-    </form>
+     </form>
         <?php
     } ?>
+        </div>
         <!--
         THIS FAVICON STUFF DOES NOT WORK.
         <ul>
