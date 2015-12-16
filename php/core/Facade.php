@@ -132,6 +132,15 @@ class Facade
         return $this->database->isUniqueUsername($username);
     }
 
+    public function isUniqueNotetitleForUser($userID, $title){
+
+        return $this->database->isUniqueNoteTitle($userID, $title);
+    }
+
+    public function makeShared($noteID, $userID){
+        return $this->database->makeShared($noteID, $userID);
+    }
+
     /*
      * Returns the recoveryString if the mail was found. False otherwise.
      */

@@ -59,15 +59,17 @@
                 <a class="navbar-brand" href="index.php?action=gotonotelist">++Notepad</a>
             </div>
             <div id="navbar" class="collapse navbar-collapse">
+
                 <ul class="nav navbar-nav">
-                    <li class=""><a href="index.php?action=gotonotelist">My Notes</a></li>
-                    <li><a href="index.php?action=gotoSharedNotes">Shared Notes</a></li>
-                    <li><a href="index.php?action=gotoaccount">Account</a></li>
-                    <li class=""><a href="index.php?action=logout">Logout</a></li>
+                    <li class=""><a href=<?php echo  "index.php?action=gotonotelist&sharednoteid=" . $this->note->getID()?>>My Notes</a></li>
+                    <li><a href=<?php echo  "index.php?action=gotoSharedNotes&sharednoteid=" . $this->note->getID()?>>Shared Notes</a></li>
+                    <li><a href=<?php echo  "index.php?action=gotoaccount&sharednoteid=" . $this->note->getID()?>>Account</a></li>
+                    <li class=""><a href=<?php echo  "index.php?action=logout&sharednoteid=" . $this->note->getID()?>>Logout</a></li>
                 </ul>
             </div>
-            <!--/.nav-collapse -->
         </div>
+
+            <!--/.nav-collapse -->
     </nav>
 
 
@@ -154,6 +156,14 @@
         <?php
     } ?>
         </div>
+    <?php if(!$this->shared){ ?>
+        <div id="makeshared">
+            <form id="makeshared" method="POST" action="index.php?action=makeshared">
+                <input type="hidden" id="noteID" name="noteID" <?php echo "value=\"" . $this->note->getID() . "\""?>/>
+                <input type="submit" class="btn btn-default btn-primary" value="Make Shared"/>
+                </form>
+        </div>
+    <?php } ?>
         <!--
         THIS FAVICON STUFF DOES NOT WORK.
         <ul>

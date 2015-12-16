@@ -644,6 +644,59 @@ class OnlineDB implements IDatabase
         return $unique;
     }
 
+    public function isUniqueNoteTitle($userID, $title){
+        $this->openConnection();
+
+        $sql = "select * from notes where userID = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1,$userID);
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $statement->execute();
+        $results = $statement->fetchAll();
+        $unique = true;
+        foreach ($results as $row)
+        {
+            if($title === $row['title']){
+                $unique = false;
+                break;
+            }
+        }
+        if($unique){
+            $sql = "select sharednoteID, sh.userID as sharedID, rightID, title, notetext, colour, n.userID as ownerID from sharednotes sh JOIN notes n ON sharednoteID = noteID where sh.userID = ?";
+            $statement = $this->con->prepare($sql);
+            $statement->bindParam(1,$userID);
+            $statement->setFetchMode(PDO::FETCH_ASSOC);
+            $statement->execute();
+            $results = $statement->fetchAll();
+            foreach ($results as $row)
+            {
+                if($title === $row['title']){
+                    $unique = false;
+                    break;
+                }
+            }
+        }
+        $this->closeConnection();
+        return $unique;
+    }
+
+    public function makeShared($noteID, $userID)
+    {
+
+        $this->openConnection();
+        $rightID = 1;
+        $sql = "insert into sharednotes(sharednoteID,userID,rightID) values(?,?,?)";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1, $noteID);
+        $statement->bindParam(2, $userID);
+        $statement->bindParam(3, $rightID);
+        $statement->execute();
+        $newSharedNote = $this->getSharedNoteDetails($noteID);
+
+        $this->closeConnection();
+        return $newSharedNote;
+    }
+
     public function createPasswordRecovery($mail, $recoveryString)
     {
         // First look for email; then create entry if it was found.

@@ -70,14 +70,15 @@
 
     <!-- let's not forget about the errors! -->
 
-    <?php if($this->errors != null){
-        foreach($this->errors as $error){ ?>
-            <p class="lead" style="color:red"><?php echo $error?></p>
 
-        <?php }} ?>
     <input type="button" class="btn btn-lg btn-primary btn-block" value="New shared note" onclick="newnotepopup()">
     <br/>
     <div class="clearfix">
+        <?php if($this->errors != null){
+            foreach($this->errors as $error){ ?>
+                <p class="lead" style="color:red"><?php echo $error?></p>
+
+            <?php }} ?>
        <label>Search: <input type="text" id="lookup" /></label>
     </div>
     <br/>
