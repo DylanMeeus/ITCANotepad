@@ -185,15 +185,19 @@ class Servlet
                     if (isset($_POST['user' . $i])) {
                         $sharedusername = $_POST['user' . $i];
                         $shareduser = $this->facade->getUserFromUsername($sharedusername);
-                        if($shareduser->getUsername() != null) {
-                            array_push($users, $shareduser);
-                            $rightID = $_POST['rightID' . $i];
-                            array_push($rightIds, $rightID);
-                        }
-                        else{
+                        if($shareduser->getUsername() == null) {
                             array_push($this->errors, "User(s) not present in database");
                             $nextPage = $this->gotoSharedNotes();
                             break;
+                        }
+                        else if($this->checkForDuplicateSharedUsers($shareduser, $users)) {
+                            array_push($this->errors, "Duplicate user forbidden");
+                            $nextPage = $this->gotoSharedNotes();
+                            break;
+                        } else{
+                            array_push($users, $shareduser);
+                            $rightID = $_POST['rightID' . $i];
+                            array_push($rightIds, $rightID);
                         }
                     } else {
                         $lastuser = true;
@@ -280,25 +284,45 @@ class Servlet
             $nextPage = $this->gotoSharedNotes();
         } elseif($action == "addsharedusers"){
             $noteID = $_POST['noteID'];
-            $users = array();
+            $this->note = $this->facade->getSharedNoteDetails($noteID);
+            $toAddusers = array();
+            $alreadyAddedUsers = $this->note->getSharedUsers();
             $rightIds = array();
             $lastuser = false;
             for ($i = 1; !$lastuser; $i++) {
                 if (isset($_POST['user' . $i])) {
                     $sharedusername = $_POST['user' . $i];
                     $shareduser = $this->facade->getUserFromUsername($sharedusername);
-
-                    array_push($users, $shareduser);
-                    $rightID = $_POST['rightID' . $i];
-                    array_push($rightIds, $rightID);
+                    if($shareduser->getUsername() == null) {
+                        array_push($this->errors, "User(s) not present in database");
+                        break;
+                    }
+                    else if($this->checkForDuplicateSharedUsers($shareduser, $alreadyAddedUsers)){
+                        array_push($this->errors, "Duplicate user forbidden");
+                        break;
+                    }
+                    else{
+                        array_push($toAddusers, $shareduser);
+                        $rightID = $_POST['rightID' . $i];
+                        array_push($rightIds, $rightID);
+                    }
                 }
                 else {
                     $lastuser = true;
                 }
             }
-            $this->facade->addSharedUsers($noteID, $users, $rightIds);
-            $this->shared = true;
+            if(empty($this->errors)) {
+                $this->facade->addSharedUsers($noteID, $toAddusers, $rightIds);
+                $this->note = $this->facade->getSharedNoteDetails($noteID);
+            }
+                $this->shared = true;
+                $nextPage = "notepage.php";
+        }elseif($action == "deleteuser"){
+            $userID = $_GET['userid'];
+            $noteID = $_GET['noteid'];
+            $this->facade->deleteSharedUser($userID, $noteID);
             $this->note = $this->facade->getSharedNoteDetails($noteID);
+            $this->shared = true;
             $nextPage = "notepage.php";
         }
         elseif ($action == "savelink")
@@ -413,6 +437,15 @@ class Servlet
         }
     }
 
+    private function checkForDuplicateSharedUsers($shareduser, $sharedusers){
+        foreach($sharedusers as $user){
+            if($user->getID() == $shareduser->getID()){
+                return true;
+            }
+        }
+        return false;
+    }
+
     private function closeSharedNote($noteID){
 
         if(($key = array_search($noteID, $this->openednotes)) !== false) {
@@ -456,6 +489,8 @@ class Servlet
         }
         return false;
     }
+
+
 
     private function generateAPIKey()
     {
