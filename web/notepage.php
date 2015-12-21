@@ -117,16 +117,15 @@
         <label for="message"></label>
         <textarea class="form-control" rows="10" id="textid"><?php echo $this->note->getText() ?></textarea>
     </div>
-    <button onclick="saveNotes()" value="button">Save</button>
-    <br/>
-    <button onclick="addLink()"> Add link</button>
+    <button class="btn btn-default btn-primary" onclick="saveNotes()" value="button">Save</button>
+    <button class="btn btn-default btn-primary" onclick="addLink()"> Add link</button>
 
-    </br>
+    <br/><br/>
 
     <div id="newlinkdiv">
-        <label>link: <input type="text" id="linkurl"/></label>
-        <label>name: <input type="text" id="linkname"/></label>
-        <button onclick="saveLink()">Save</button>
+        <label>Link: </label><input type="text" id="linkurl"/>
+        <label>Name: </label><input type="text" id="linkname"/>
+        <button class="btn btn-default btn-primary" onclick="saveLink()">Save</button>
     </div>
 <!--
     <button onclick="sendNoteAsMail()">Mail</button>
@@ -150,8 +149,8 @@
         <div id="users">
         </div>
         <br/>
-        <input type="button" class="btn btn-default btn-primary" value="Add other user" onclick="addUser()"/>
-        <input type="submit" class="btn btn-default btn-primary" value="Confirm"/>
+        <button type="button" class="btn btn-default btn-primary" onclick="addUserInNotepage()">Add other user</button>
+        <input type="submit" id="adduserbutton" class="btn btn-default btn-primary" value="Confirm"/>
      </form>
         <?php
     } ?>

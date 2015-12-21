@@ -71,7 +71,7 @@
     <!-- let's not forget about the errors! -->
 
 
-    <input type="button" class="btn btn-lg btn-primary btn-block" value="New shared note" onclick="newnotepopup()">
+    <input type="button" class="btn btn-lg btn-primary btn-block" value="New shared note" onclick="createNote()">
     <br/>
     <div class="clearfix">
         <?php if($this->errors != null){
@@ -92,8 +92,8 @@
             </select>
             </div>
             <br/>
-            <input type="button" class="btn btn-default btn-primary" value="Add user" onclick="addUser()"/>
-            <input type="submit" class="btn btn-default btn-primary" value="Create"/>
+            <input type="button" class="btn btn-default btn-primary" value="Add user" onclick="addUserAtOverview()"/>
+            <input type="submit" id="adduser" class="btn btn-default btn-primary" value="Create"/>
         </form>
 
 

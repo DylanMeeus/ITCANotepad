@@ -77,7 +77,7 @@
 
         <?php }} ?>
 
-    <input type="button" class="btn btn-lg btn-primary btn-block" value="New note" onclick="newnotepopup()">
+    <input type="button" class="btn btn-lg btn-primary btn-block" value="New note" onclick="createNote()">
     <br/>
     <div class="clearfix">
         <label>Search: <input type="text" id="lookup" /></label>

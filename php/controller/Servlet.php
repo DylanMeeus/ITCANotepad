@@ -157,11 +157,16 @@ class Servlet
             $nextPage = "notepage.php";
             $title = $_POST['newnotetitle'];
             $user = $_SESSION["user"];
-            if(!$this->facade->isUniqueNotetitleForUser($user->getID(),$title)){
+            if($title === ""){
+                array_push($this->errors, "Title can't be empty");
+                $nextPage = 'notes.php';
+            }
+            else if(!$this->facade->isUniqueNotetitleForUser($user->getID(),$title)){
                 array_push($this->errors, "You already have created a note with that title");
                 $this->notes = $this->facade->getNotes($user->getID());
                 $nextPage = 'notes.php';
             }
+
             else {
                 $this->note = $this->facade->addNote($user->getID(), $title);
                 $this->notelinks = null;
@@ -171,18 +176,22 @@ class Servlet
             $nextPage = "notepage.php";
             $title = $_POST['newnotetitle'];
             $user = $_SESSION["user"];
-            if(!$this->facade->isUniqueNotetitleForUser($user->getID(),$title)){
+            if($title === ""){
+                array_push($this->errors, "Title can't be empty");
+                $nextPage = $this->gotoSharedNotes();
+            }
+            else if(!$this->facade->isUniqueNotetitleForUser($user->getID(),$title)){
                 array_push($this->errors, "You already have a note with that title");
                 $nextPage = $this->gotoSharedNotes();
             }
-            else{
+
                 $users = array();
                 $rightIds = array();
                 $lastuser = false;
 
                 for ($i = 1; !$lastuser; $i++) {
-                    if (isset($_POST['user' . $i])) {
-                        $sharedusername = $_POST['user' . $i];
+                    if (isset($_POST['username' . $i])) {
+                        $sharedusername = $_POST['username' . $i];
                         $shareduser = $this->facade->getUserFromUsername($sharedusername);
                         if($shareduser->getUsername() == null) {
                             array_push($this->errors, "User(s) not present in database");
@@ -206,7 +215,7 @@ class Servlet
                     $this->note = $this->facade->addSharedNote($user->getID(), $users, $title, $rightIds);
                     $this->notelinks = null;
                 }
-            }
+
         }
         elseif($action == "makeshared"){
             $this->shared = true;
@@ -289,8 +298,8 @@ class Servlet
             $rightIds = array();
             $lastuser = false;
             for ($i = 1; !$lastuser; $i++) {
-                if (isset($_POST['user' . $i])) {
-                    $sharedusername = $_POST['user' . $i];
+                if (isset($_POST['username' . $i])) {
+                    $sharedusername = $_POST['username' . $i];
                     $shareduser = $this->facade->getUserFromUsername($sharedusername);
                     if($shareduser->getUsername() == null) {
                         array_push($this->errors, "User(s) not present in database");
