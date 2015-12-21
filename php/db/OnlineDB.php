@@ -406,7 +406,6 @@ class OnlineDB implements IDatabase
         $statement->bindParam(3, $noteID);
         $statement->execute();
         $this->closeConnection();
-
     }
 
 

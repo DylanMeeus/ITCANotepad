@@ -132,7 +132,7 @@ class Servlet
                     {
                         $foundID = true;
                         $this->notelinks = $this->facade->getLinks($noteID);
-                        array_push($this->openednotes, $noteID);
+                        array_unshift($this->openednotes, $noteID);
                         $nextPage = "notepage.php";
                         break;
                     }
@@ -144,7 +144,6 @@ class Servlet
                 array_push($this->errors, "Somebody is working on that note, try again later");
                 $nextPage = $this->gotoSharedNotes();
             }
-
         }elseif ($action == "savenote")
         {
             $noteID = $_POST['noteid'];
@@ -448,17 +447,13 @@ class Servlet
 
     private function closeSharedNote($noteID){
 
-        if(($key = array_search($noteID, $this->openednotes)) !== false) {
-            unset($this->openednotes[$key]);
-        }
-        /*
             //we search the key in the array 'openednotes' that corresponds to the noteID.
             for($i = 0; $i < sizeof($this->openednotes);$i++){
-                if($this->openednotes[$i]->getID() == $noteID){
+                if($this->openednotes[$i] == $noteID){
                     //if found, we remove the noteID from the array to show that the note is no longer being editted
                     unset($this->openednotes[$i]);
                 }
-            }*/
+            }
     }
 
     private function populateErrors()
