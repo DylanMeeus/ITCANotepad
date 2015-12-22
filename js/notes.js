@@ -100,9 +100,14 @@ function getUsernames(){
 }
 
 function removeuser(){
+    //forbidden to delete first userfield (need to click cancel button to completely quit)
     if(sharedUsers > 2) {
         var node = document.getElementById("users");
         node.removeChild(node.lastChild);
+        //we need to remove the <br> if it has just been added in the div
+        if(sharedUsers % 3 == 1){
+            node.removeChild(node.lastChild);
+        }
         --sharedUsers;
     }
    // element.parentNode.removeChild(element);
@@ -183,8 +188,13 @@ function addUser(element){
         .append(txt)
         .append(select)
         .append("&nbsp;");
-    $("#users").append(userDiv);
 
+    $("#users").append(userDiv);
+    document.getElementById("user" + sharedUsers).style.display = 'inline';
+    if(sharedUsers % 3 == 0){
+        var br = $("<br/>");
+        $("#users").append(br);
+    }
     sharedUsers++;
 }
 
