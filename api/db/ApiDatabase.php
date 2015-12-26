@@ -1,6 +1,7 @@
 <?php
 
-class ApiDatabase {
+require_once "db/IApiDatabase.php";
+class ApiDatabase implements IApiDatabase{
 
     private $servername = "it-ca.net";
     private $username = "itca_global";
@@ -61,6 +62,18 @@ class ApiDatabase {
         $statement->bindParam(2,$text);
         $statement->bindParam(3,$userID);
         $statement->execute();
+        $this->closeConnection();
+    }
+
+    public  function getUserNotes($userid)
+    {
+        $this->openConnection();
+
+
+        $sql = "select * from notes where userID = ?";
+
+
+
         $this->closeConnection();
     }
 }

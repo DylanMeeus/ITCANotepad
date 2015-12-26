@@ -25,4 +25,9 @@ class ApiFacade
         return $this->apidatabase->authenticateKey($key);
     }
 
+    public function getUserNotes($userid)
+    {
+        return $this->apidatabase->getUserNotes($userid);
+    }
+
 }
