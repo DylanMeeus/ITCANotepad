@@ -61,7 +61,7 @@
 
 
 
-</br></br></br>
+<br/><br/><br/>
 
     <!-- loop over the notifications -->
     <?php if($this->notifications != null){

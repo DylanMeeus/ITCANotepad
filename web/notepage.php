@@ -174,10 +174,11 @@
     <button onclick="getIcons()">ICON</button>
     -->
     <?php } else{ ?>
+     <br/><br/><br/>
     <h1><?php echo $this->note->getTitle(); ?></h1>
     <label>Shared users:</label>
     <?php foreach($this->note->getSharedUsers() as $user){ echo $user->getUsername();  ?> &nbsp; <?php } ?>
-    <br/>
+    <br/><br/>
     <p><?php echo $this->note->getText(); ?></p>
     <?php } ?>
 
