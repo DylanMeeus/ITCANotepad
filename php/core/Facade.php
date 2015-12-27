@@ -40,6 +40,14 @@ class Facade
         return $this->database->getUserFromUsername($username);
     }
 
+    public function openSharedNote($noteID){
+        $this->database->openSharedNote($noteID);
+    }
+
+    public function closeSharedNote($noteID){
+        $this->database->closeSharedNote($noteID);
+    }
+
     public function deleteSharedNote($noteID){
         $this->database->deleteSharedNote($noteID);
     }

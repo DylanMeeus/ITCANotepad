@@ -56,7 +56,7 @@
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                     <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.php?action=gotonotelist">++Notepad</a>
+                <a class="navbar-brand" href=<?php echo  "index.php?action=gotonotelist&sharednoteid=" . $this->note->getID()?>>++Notepad</a>
             </div>
             <div id="navbar" class="collapse navbar-collapse">
 
@@ -102,6 +102,8 @@
 
         <?php }} ?>
 
+    <?php if($this->right == 1 || $this->right == 3){ ?>
+
     <h3 id="savedID">Saved</h3>
 
     <div id="notetextdiv"  class="form-group">
@@ -115,7 +117,7 @@
             <?php } } ?>
         </br>
         <label for="message"></label>
-        <textarea class="form-control" rows="10" id="textid"><?php echo $this->note->getText() ?></textarea>
+        <textarea class="form-control" rows="10" id="textid" ><?php echo $this->note->getText() ?></textarea>
     </div>
     <button class="btn btn-default btn-primary" onclick="saveNotes()" value="button">Save</button>
     <button class="btn btn-default btn-primary" onclick="addLink()"> Add link</button>
@@ -171,6 +173,14 @@
     </div>
     <button onclick="getIcons()">ICON</button>
     -->
+    <?php } else{ ?>
+    <h1><?php echo $this->note->getTitle(); ?></h1>
+    <label>Shared users:</label>
+    <?php foreach($this->note->getSharedUsers() as $user){ echo $user->getUsername();  ?> &nbsp; <?php } ?>
+    <br/>
+    <p><?php echo $this->note->getText(); ?></p>
+    <?php } ?>
+
 
 </div>
 <!-- /.container -->

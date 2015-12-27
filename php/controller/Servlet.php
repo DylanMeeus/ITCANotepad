@@ -21,6 +21,7 @@ class Servlet
     private $recoveryData;
     //true: shows extra partials needed for options for shared notes
     private $shared;
+    private $right;
     // We need to get rid of saying "Echo" in the servlet. ECHO == UI stuff; out with that demon here!
     private $errors = array(); // Logs the errors that occur -> each page loops over this array to see if it needs to display something
     private $notifications = array(); // Logs the notifications (They can be seen as 'successes' as opposed to 'errors'.
@@ -125,14 +126,16 @@ class Servlet
 
             $this->note = $this->facade->getSharedNoteDetails($noteID);
             $foundID = false;
-            if(!$this->checkIfNoteIsOpened($noteID)){
-                foreach($this->note->getSharedUsers() as $shareduser){
-
-                    if ($shareduser->getID() == $user->getID())
+            if(!$this->note->isOpened()){
+                $sharedusers = $this->note->getSharedUsers();
+                for($i = 0; $i < sizeof($sharedusers); $i++){
+                    if ($sharedusers[$i]->getID() == $user->getID())
                     {
                         $foundID = true;
+                        $this->right = $this->note->getRights()[$i];
                         $this->notelinks = $this->facade->getLinks($noteID);
-                        array_unshift($this->openednotes, $noteID);
+                        $this->facade->openSharedNote($noteID);
+                       // array_push($this->openednotes, $this->note);
                         $nextPage = "notepage.php";
                         break;
                     }
@@ -172,6 +175,7 @@ class Servlet
                 $this->notelinks = null;
             }
         }elseif ($action == "createsharednote") {
+            $this->right = 1;
             $this->shared = true;
             $nextPage = "notepage.php";
             $title = $_POST['newnotetitle'];
@@ -239,7 +243,7 @@ class Servlet
         {
             if(isset($_GET['sharednoteid'])){
                 $sharednoteID = $_GET['sharednoteid'];
-                $this->closeSharedNote($sharednoteID);
+                $this->facade->closeSharedNote($sharednoteID);
             }
             $user = $_SESSION["user"];
             $this->notes = $this->facade->getNotes($user->getID());
@@ -291,6 +295,7 @@ class Servlet
             $this->notes = $this->facade->getSharedNotes($user->getID());
             $nextPage = $this->gotoSharedNotes();
         } elseif($action == "addsharedusers"){
+            $this->shared = 1;
             $noteID = $_POST['noteID'];
             $this->note = $this->facade->getSharedNoteDetails($noteID);
             $toAddusers = array();
@@ -350,14 +355,14 @@ class Servlet
         {
             if(isset($_GET['sharednoteid'])){
                 $sharednoteID = $_GET['sharednoteid'];
-                $this->closeSharedNote($sharednoteID);
+                $this->facade->closeSharedNote($sharednoteID);
             }
             $nextPage = $this->logout();
         } elseif ($action == "gotoaccount")
         {
             if(isset($_GET['sharednoteid'])){
                 $sharednoteID = $_GET['sharednoteid'];
-                $this->closeSharedNote($sharednoteID);
+                $this->facade->closeSharedNote($sharednoteID);
             }
             $nextPage = $this->gotoAccount();
         } elseif ($action == "changePassword")
@@ -367,7 +372,7 @@ class Servlet
         {
             if(isset($_GET['sharednoteid'])){
                 $sharednoteID = $_GET['sharednoteid'];
-                $this->closeSharedNote($sharednoteID);
+                $this->facade->closeSharedNote($sharednoteID);
             }
                 $nextPage = $this->gotoSharedNotes();
         }elseif ($action == "notelookup")
@@ -457,10 +462,10 @@ class Servlet
     private function closeSharedNote($noteID){
 
             //we search the key in the array 'openednotes' that corresponds to the noteID.
-            for($i = 0; $i < sizeof($this->openednotes);$i++){
-                if($this->openednotes[$i] == $noteID){
+            foreach($this->openednotes as $note){
+                if($note->getID() == $noteID){
                     //if found, we remove the noteID from the array to show that the note is no longer being editted
-                    unset($this->openednotes[$i]);
+                    $note->setOpened(false);
                 }
             }
     }
@@ -485,9 +490,9 @@ class Servlet
     }
 
     private function checkIfNoteIsOpened($noteID){
-        foreach($this->openednotes as $openednoteID){
-            if($noteID == $openednoteID){
-                return true;
+        foreach($this->openednotes as $note){
+            if($noteID == $note->getID()){
+                return $note->isOpened();
                 break;
             }
         }

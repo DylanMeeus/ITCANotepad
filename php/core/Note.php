@@ -10,10 +10,13 @@ class Note {
     private $userID;
     private $owner;
     private $sharedusers;
+    private $rights;
+    private $opened;
 
     public function __construct()
     {
         $this->sharedusers = array();
+        $this->opened = false;
     }
 
     public function getID(){return $this->id;}
@@ -23,6 +26,8 @@ class Note {
     public function getUserID(){return $this->userID;}
     public function getSharedUsers(){return $this->sharedusers;}
     public function getOwner(){return $this->owner;}
+    public function getRights(){return $this->rights;}
+    public function isOpened(){ return $this->opened;}
 
     public function setOwner($own){$this->owner = $own;}
     public function setID($noteid){$this->id = $noteid;}
@@ -31,4 +36,6 @@ class Note {
     public function setColour($c){$this->colour = $c;}
     public function setUserID($id){$this->userID = $id;}
     public function setSharedUsers($list){$this->sharedusers = $list;}
+    public function setRights($rightList){ $this->rights = $rightList;}
+    public function setOpened($opened){ $this->opened = $opened;}
 }
