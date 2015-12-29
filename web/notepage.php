@@ -34,7 +34,7 @@
     <script type="text/javascript" src="jscolor/jscolor.js"></script>
 </head>
 
-<body onload="setupNoteDetailPage()">
+<body onload="setupNoteDetailPage(), getUsernames()">
 
 
 <input type="hidden" id="noteID" <?php echo "value=\"" . $this->note->getID() . "\""?>/>
@@ -56,18 +56,20 @@
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                     <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.php?action=gotonotelist">++Notepad</a>
+                <a class="navbar-brand" href=<?php echo  "index.php?action=gotonotelist&sharednoteid=" . $this->note->getID()?>>++Notepad</a>
             </div>
             <div id="navbar" class="collapse navbar-collapse">
+
                 <ul class="nav navbar-nav">
-                    <li class=""><a href="index.php?action=gotonotelist">My Notes</a></li>
-                    <li><a href="index.php?action=gotoSharedNotes">Shared Notes</a></li>
-                    <li><a href="index.php?action=gotoaccount">Account</a></li>
-                    <li class=""><a href="index.php?action=logout">Logout</a></li>
+                    <li class=""><a href=<?php echo  "index.php?action=gotonotelist&sharednoteid=" . $this->note->getID()?>>My Notes</a></li>
+                    <li><a href=<?php echo  "index.php?action=gotoSharedNotes&sharednoteid=" . $this->note->getID()?>>Shared Notes</a></li>
+                    <li><a href=<?php echo  "index.php?action=gotoaccount&sharednoteid=" . $this->note->getID()?>>Account</a></li>
+                    <li class=""><a href=<?php echo  "index.php?action=logout&sharednoteid=" . $this->note->getID()?>>Logout</a></li>
                 </ul>
             </div>
-            <!--/.nav-collapse -->
         </div>
+
+            <!--/.nav-collapse -->
     </nav>
 
 
@@ -97,6 +99,8 @@
 
         <?php }} ?>
 
+    <?php if($this->right == 1 || $this->right == 3){ ?>
+
     <h3 id="savedID">Saved</h3>
 
     <div id="notetextdiv"  class="form-group">
@@ -111,18 +115,17 @@
             <?php } } ?>
         </br>
         <label for="message"></label>
-        <textarea class="form-control" rows="10" id="textid"><?php echo $this->note->getText() ?></textarea>
+        <textarea class="form-control" rows="10" id="textid" ><?php echo $this->note->getText() ?></textarea>
     </div>
-    <button onclick="saveNotes()" value="button">Save</button>
-    <br/>
-    <button onclick="addLink()"> Add link</button>
+    <button class="btn btn-default btn-primary" onclick="saveNotes()" value="button">Save</button>
+    <button class="btn btn-default btn-primary" onclick="addLink()"> Add link</button>
 
-    </br>
+    <br/><br/>
 
     <div id="newlinkdiv">
-        <label>link: <input type="text" id="linkurl"/></label>
-        <label>name: <input type="text" id="linkname"/></label>
-        <button onclick="saveLink()">Save</button>
+        <label>Link: </label><input type="text" id="linkurl"/>
+        <label>Name: </label><input type="text" id="linkname"/>
+        <button class="btn btn-default btn-primary" onclick="saveLink()">Save</button>
     </div>
 <!--
     <button onclick="sendNoteAsMail()">Mail</button>
@@ -139,17 +142,27 @@
         }} ?>
 </div>
     <br/>
-    <?php if($this->shared){ ?>
-    <form id="userform" method="POST" action="index.php?action=addsharedusers">
-        <input type="hidden" id="noteID" name="noteID" <?php echo "value=\"" . $this->note->getID() . "\""?>/>
-    <div id="users">
-    </div>
+    <?php if($this->shared && $_SESSION["user"]->getID() == $this->note->getUserID()){ ?>
+    <div id="addusers">
+            <form id="userform" method="POST" action="index.php?action=addsharedusers">
+            <input type="hidden" id="noteID" name="noteID" <?php echo "value=\"" . $this->note->getID() . "\""?>/>
+        <div id="users">
+        </div>
         <br/>
-        <input type="button" class="btn btn-default btn-primary" value="Add other user" onclick="addUser()"/>
-        <input type="submit" class="btn btn-default btn-primary" value="Confirm"/>
-    </form>
+        <button type="button" class="btn btn-default btn-primary" onclick="addUserInNotepage()">Add other user</button>
+        <input type="submit" id="adduserbutton" class="btn btn-default btn-primary" value="Confirm"/>
+     </form>
         <?php
     } ?>
+        </div>
+    <?php if(!$this->shared){ ?>
+        <div id="makeshared">
+            <form id="makeshared" method="POST" action="index.php?action=makeshared">
+                <input type="hidden" id="noteID" name="noteID" <?php echo "value=\"" . $this->note->getID() . "\""?>/>
+                <input type="submit" class="btn btn-default btn-primary" value="Make Shared"/>
+                </form>
+        </div>
+    <?php } ?>
         <!--
         THIS FAVICON STUFF DOES NOT WORK.
         <ul>
@@ -158,6 +171,15 @@
     </div>
     <button onclick="getIcons()">ICON</button>
     -->
+    <?php } else{ ?>
+     <br/><br/><br/>
+    <h1><?php echo $this->note->getTitle(); ?></h1>
+    <label>Shared users:</label>
+    <?php foreach($this->note->getSharedUsers() as $user){ echo $user->getUsername();  ?> &nbsp; <?php } ?>
+    <br/><br/>
+    <p><?php echo $this->note->getText(); ?></p>
+    <?php } ?>
+
 
 </div>
 <!-- /.container -->

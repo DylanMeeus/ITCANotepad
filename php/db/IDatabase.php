@@ -14,9 +14,13 @@ interface IDatabase
     public function addSharedUsers($noteID, $users, $rightIDList);
     public function deleteSharedUser($userID, $noteID);
     public function deleteSharedNote($noteID);
+    public function isUniqueNoteTitle($userID, $title);
+    public function makeShared($noteID, $userID);
     public function getSharedNotes($userID);
     public function getSharedNoteDetails($noteID);
     public function getUserDetails($userID);
+    public function openSharedNote($noteID);
+    public function closeSharedNote($noteID);
     public function deleteNote($noteID);
     public function updateNote($noteID, $noteTitle, $noteText, $colour);
     public function register($username,$password, $mail);

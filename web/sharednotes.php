@@ -30,7 +30,7 @@
     <![endif]-->
 </head>
 
-<body onload="setupPage()">
+<body onload="setupPage(), getUsernames()">
 
 
 <div class="container">
@@ -55,7 +55,12 @@
         </div>
     </nav>
 
-    </br></br></br>
+    <br/><br/><br/>
+
+    <!--<?php
+   /* for($i = 0; $i < sizeof($_GET['users']);$i++){ ?>
+    <input type="hidden" id="username" . <?php echo $i; ?> value="<?php echo $_GET['users'][$i]->getUsername()?>"/>
+    <?php }?>--> */?>
 
     <!-- loop over the notifications -->
     <?php if($this->notifications != null){
@@ -65,14 +70,15 @@
 
     <!-- let's not forget about the errors! -->
 
-    <?php if($this->errors != null){
-        foreach($this->errors as $error){ ?>
-            <p class="lead" style="color:red"><?php echo $error?></p>
 
-        <?php }} ?>
-    <input type="button" class="btn btn-lg btn-primary btn-block" value="New shared note" onclick="newnotepopup()">
+    <input type="button" class="btn btn-lg btn-primary btn-block" value="New shared note" onclick="createNote()">
     <br/>
     <div class="clearfix">
+        <?php if($this->errors != null){
+            foreach($this->errors as $error){ ?>
+                <p class="lead" style="color:red"><?php echo $error?></p>
+
+            <?php }} ?>
        <label>Search: <input type="text" id="lookup" /></label>
     </div>
     <br/>
@@ -86,12 +92,13 @@
             </select>
             </div>
             <br/>
-            <input type="button" class="btn btn-default btn-primary" value="Add user" onclick="addUser()"/>
-            <input type="submit" class="btn btn-default btn-primary" value="Create"/>
+            <input type="button" class="btn btn-default btn-primary" value="Add user" onclick="addUserAtOverview()"/>
+            <input type="submit" id="adduser" class="btn btn-default btn-primary" value="Create"/>
         </form>
 
 
     </div>
+
 
     <div id="notelist">
         <?php  if($this->notes != null){ foreach ($this->notes as $note) {

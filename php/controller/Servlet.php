@@ -15,11 +15,13 @@ class Servlet
     private $facade;
     private $notes;
     private $note;
+    private $openednotes;
     private $redirect;
     private $notelinks;
     private $recoveryData;
     //true: shows extra partials needed for options for shared notes
     private $shared;
+    private $right;
     // We need to get rid of saying "Echo" in the servlet. ECHO == UI stuff; out with that demon here!
     private $errors = array(); // Logs the errors that occur -> each page loops over this array to see if it needs to display something
     private $notifications = array(); // Logs the notifications (They can be seen as 'successes' as opposed to 'errors'.
@@ -28,6 +30,7 @@ class Servlet
     {
         $this->shared = false;
         $this->facade = new Facade();
+        $this->openednotes = array();
     }
 
     public function processRequest()
@@ -116,26 +119,34 @@ class Servlet
         {
             $this->shared = true;
             $noteID = $_GET['noteid'];
-            $_POST['noteid'] = $noteID; // get it async using jquery and writing a new query, or just loop here?
+            $_POST['noteid'] = $noteID;
 
-            // does the note belong to this user?
             $user = $_SESSION["user"];
+
 
             $this->note = $this->facade->getSharedNoteDetails($noteID);
             $foundID = false;
-            foreach($this->note->getSharedUsers() as $shareduser){
-                if ($shareduser->getID() == $user->getID())
-                {
-                    $foundID = true;
-                    $this->notelinks = $this->facade->getLinks($noteID);
-                    $nextPage = "notepage.php";
-                    break;
+            if(!$this->note->isOpened()){
+                $sharedusers = $this->note->getSharedUsers();
+                for($i = 0; $i < sizeof($sharedusers); $i++){
+                    if ($sharedusers[$i]->getID() == $user->getID())
+                    {
+                        $foundID = true;
+                        $this->right = $this->note->getRights()[$i];
+                        $this->notelinks = $this->facade->getLinks($noteID);
+                        $this->facade->openSharedNote($noteID);
+                       // array_push($this->openednotes, $this->note);
+                        $nextPage = "notepage.php";
+                        break;
+                    }
                 }
+                if(!$foundID){
+                    $nextPage = "errorpage.php";
+                }
+            } else{
+                array_push($this->errors, "Somebody is working on that note, try again later");
+                $nextPage = $this->gotoSharedNotes();
             }
-            if(!$foundID){
-                $nextPage = "errorpage.php";
-            }
-
         }elseif ($action == "savenote")
         {
             $this->facade->cipher("Hey, Hello World!");
@@ -147,35 +158,94 @@ class Servlet
             $this->redirect = false;
         } elseif ($action == "createnote")
         {
-            $title = $_POST['newnotetitle'];
-            $user = $_SESSION["user"];
-            $this->note = $this->facade->addNote($user->getID(), $title);
-            $this->notelinks = null;
             $nextPage = "notepage.php";
-        }elseif ($action == "createsharednote") {
-            $this->shared = true;
             $title = $_POST['newnotetitle'];
             $user = $_SESSION["user"];
-            $users = array();
-            $rightIds = array();
-            $lastuser = false;
-            for ($i = 1; !$lastuser; $i++) {
-                if (isset($_POST['user' . $i])) {
-                    $sharedusername = $_POST['user' . $i];
-                    $shareduser = $this->facade->getUserFromUsername($sharedusername);
-                    array_push($users, $shareduser);
-                    $rightID = $_POST['rightID' . $i];
-                    array_push($rightIds, $rightID);
-                } else {
-                    $lastuser = true;
+            if($title === ""){
+                array_push($this->errors, "Title can't be empty");
+                $nextPage = 'notes.php';
+            }
+            else if(!$this->facade->isUniqueNotetitleForUser($user->getID(),$title)){
+                array_push($this->errors, "You already have created a note with that title");
+                $this->notes = $this->facade->getNotes($user->getID());
+                $nextPage = 'notes.php';
+            }
+
+            else {
+                $this->note = $this->facade->addNote($user->getID(), $title);
+                $this->notelinks = null;
+            }
+        }elseif ($action == "createsharednote") {
+            $this->right = 1;
+            $this->shared = true;
+            $nextPage = "notepage.php";
+            $title = $_POST['newnotetitle'];
+            $user = $_SESSION["user"];
+            if($title === ""){
+                array_push($this->errors, "Title can't be empty");
+                $nextPage = $this->gotoSharedNotes();
+            }
+            else if(!$this->facade->isUniqueNotetitleForUser($user->getID(),$title)){
+                array_push($this->errors, "You already have a note with that title");
+                $nextPage = $this->gotoSharedNotes();
+            }
+
+                $users = array();
+                $rightIds = array();
+                $lastuser = false;
+
+                for ($i = 1; !$lastuser; $i++) {
+                    if (isset($_POST['username' . $i])) {
+                        $sharedusername = $_POST['username' . $i];
+                        $shareduser = $this->facade->getUserFromUsername($sharedusername);
+                        if($shareduser->getUsername() == null) {
+                            array_push($this->errors, "User(s) not present in database");
+                            $nextPage = $this->gotoSharedNotes();
+                            break;
+                        }
+                        else if($this->checkForDuplicateSharedUsers($shareduser, $users)) {
+                            array_push($this->errors, "Duplicate user forbidden");
+                            $nextPage = $this->gotoSharedNotes();
+                            break;
+                        } else{
+                            array_push($users, $shareduser);
+                            $rightID = $_POST['rightID' . $i];
+                            array_push($rightIds, $rightID);
+                        }
+                    } else {
+                        $lastuser = true;
+                    }
+                }
+                if(empty($this->errors)) {
+                    $this->note = $this->facade->addSharedNote($user->getID(), $users, $title, $rightIds);
+                    $this->notelinks = null;
+                }
+
+        }
+        elseif($action == "makeshared"){
+            $this->shared = true;
+            $noteID = $_POST['noteID'];
+            $user = $_SESSION['user'];
+            $this->note = $this->facade->makeShared($noteID, $user->getID());
+            $nextPage = "notepage.php";
+        } elseif($action == "getUsers") {
+            $users = $this->facade->getUsers();
+            $usernames = array();
+            $currentUser = $_SESSION["user"];
+            foreach ($users as $user) {
+                if($currentUser->getID() != $user->getID()){
+                    array_push($usernames, $user->getUsername());
                 }
             }
-            $this->note = $this->facade->addSharedNote($user->getID(), $users, $title, $rightIds);
-            $this->notelinks = null;
-            $nextPage = "notepage.php";
+            echo json_encode($usernames);
+            $this->redirect = false;
         }
         elseif ($action == "gotonotelist")
         {
+            if(isset($_GET['sharednoteid'])){
+                $sharednoteID = $_GET['sharednoteid'];
+                $this->facade->closeSharedNote($sharednoteID);
+            }
             $user = $_SESSION["user"];
             $this->notes = $this->facade->getNotes($user->getID());
             $nextPage = "notes.php";
@@ -226,25 +296,47 @@ class Servlet
             $this->notes = $this->facade->getSharedNotes($user->getID());
             $nextPage = $this->gotoSharedNotes();
         } elseif($action == "addsharedusers"){
+            $this->shared = 1;
             $noteID = $_POST['noteID'];
-            $users = array();
+            $this->note = $this->facade->getSharedNoteDetails($noteID);
+            $toAddusers = array();
+            $alreadyAddedUsers = $this->note->getSharedUsers();
             $rightIds = array();
             $lastuser = false;
             for ($i = 1; !$lastuser; $i++) {
-                if (isset($_POST['user' . $i])) {
-                    $sharedusername = $_POST['user' . $i];
+                if (isset($_POST['username' . $i])) {
+                    $sharedusername = $_POST['username' . $i];
                     $shareduser = $this->facade->getUserFromUsername($sharedusername);
-                    array_push($users, $shareduser);
-                    $rightID = $_POST['rightID' . $i];
-                    array_push($rightIds, $rightID);
+                    if($shareduser->getUsername() == null) {
+                        array_push($this->errors, "User(s) not present in database");
+                        break;
+                    }
+                    else if($this->checkForDuplicateSharedUsers($shareduser, $alreadyAddedUsers)){
+                        array_push($this->errors, "Duplicate user forbidden");
+                        break;
+                    }
+                    else{
+                        array_push($toAddusers, $shareduser);
+                        $rightID = $_POST['rightID' . $i];
+                        array_push($rightIds, $rightID);
+                    }
                 }
                 else {
                     $lastuser = true;
                 }
             }
-            $this->facade->addSharedUsers($noteID, $users, $rightIds);
-            $this->shared = true;
+            if(empty($this->errors)) {
+                $this->facade->addSharedUsers($noteID, $toAddusers, $rightIds);
+                $this->note = $this->facade->getSharedNoteDetails($noteID);
+            }
+                $this->shared = true;
+                $nextPage = "notepage.php";
+        }elseif($action == "deleteuser"){
+            $userID = $_GET['userid'];
+            $noteID = $_GET['noteid'];
+            $this->facade->deleteSharedUser($userID, $noteID);
             $this->note = $this->facade->getSharedNoteDetails($noteID);
+            $this->shared = true;
             $nextPage = "notepage.php";
         }
         elseif ($action == "savelink")
@@ -262,18 +354,28 @@ class Servlet
             $this->redirect = false;
         } elseif ($action == "logout")
         {
+            if(isset($_GET['sharednoteid'])){
+                $sharednoteID = $_GET['sharednoteid'];
+                $this->facade->closeSharedNote($sharednoteID);
+            }
             $nextPage = $this->logout();
         } elseif ($action == "gotoaccount")
         {
+            if(isset($_GET['sharednoteid'])){
+                $sharednoteID = $_GET['sharednoteid'];
+                $this->facade->closeSharedNote($sharednoteID);
+            }
             $nextPage = $this->gotoAccount();
         } elseif ($action == "changePassword")
         {
             $nextPage = $this->changePassword();
         } elseif ($action == "gotoSharedNotes")
         {
-            $user = $_SESSION["user"];
-            $this->notes = $this->facade->getSharedNotes($user->getID());
-            $nextPage = $this->gotoSharedNotes();
+            if(isset($_GET['sharednoteid'])){
+                $sharednoteID = $_GET['sharednoteid'];
+                $this->facade->closeSharedNote($sharednoteID);
+            }
+                $nextPage = $this->gotoSharedNotes();
         }elseif ($action == "notelookup")
         {
             $word = $_GET['word'];
@@ -353,6 +455,26 @@ class Servlet
         }
     }
 
+    private function checkForDuplicateSharedUsers($shareduser, $sharedusers){
+        foreach($sharedusers as $user){
+            if($user->getID() == $shareduser->getID()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function closeSharedNote($noteID){
+
+            //we search the key in the array 'openednotes' that corresponds to the noteID.
+            foreach($this->openednotes as $note){
+                if($note->getID() == $noteID){
+                    //if found, we remove the noteID from the array to show that the note is no longer being editted
+                    $note->setOpened(false);
+                }
+            }
+    }
+
     private function populateErrors()
     {
 
@@ -371,6 +493,17 @@ class Servlet
 
 
     }
+
+    private function checkIfNoteIsOpened($noteID){
+        foreach($this->openednotes as $note){
+            if($noteID == $note->getID()){
+                return $note->isOpened();
+                break;
+            }
+        }
+        return false;
+    }
+
 
 
     private function generateAPIKey()
@@ -420,6 +553,8 @@ class Servlet
 
     public function gotoSharedNotes()
     {
+        $user = $_SESSION["user"];
+        $this->notes = $this->facade->getSharedNotes($user->getID());
         return "sharednotes.php";
     }
 

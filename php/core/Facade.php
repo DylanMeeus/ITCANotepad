@@ -47,6 +47,14 @@ class Facade
         return $this->database->getUserFromUsername($username);
     }
 
+    public function openSharedNote($noteID){
+        $this->database->openSharedNote($noteID);
+    }
+
+    public function closeSharedNote($noteID){
+        $this->database->closeSharedNote($noteID);
+    }
+
     public function deleteSharedNote($noteID){
         $this->database->deleteSharedNote($noteID);
     }
@@ -57,6 +65,10 @@ class Facade
     public function addSharedNote($userID, $users, $title, $rightIDList)
     {
         return $this->database->addSharedNote($userID, $users, $title, $rightIDList);
+    }
+
+    public function getUsers(){
+        return $this->database->getUsers();
     }
 
     public function getNoteDetails($noteID)
@@ -133,6 +145,15 @@ class Facade
     public function isUniqueUsername($username)
     {
         return $this->database->isUniqueUsername($username);
+    }
+
+    public function isUniqueNotetitleForUser($userID, $title){
+
+        return $this->database->isUniqueNoteTitle($userID, $title);
+    }
+
+    public function makeShared($noteID, $userID){
+        return $this->database->makeShared($noteID, $userID);
     }
 
     /*

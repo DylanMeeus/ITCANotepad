@@ -61,7 +61,7 @@
 
 
 
-</br></br></br>
+<br/><br/><br/>
 
     <!-- loop over the notifications -->
     <?php if($this->notifications != null){
@@ -77,7 +77,7 @@
 
         <?php }} ?>
 
-    <input type="button" class="btn btn-lg btn-primary btn-block" value="New note" onclick="newnotepopup()">
+    <input type="button" class="btn btn-lg btn-primary btn-block" value="New note" onclick="createNote()">
     <br/>
     <div class="clearfix">
         <label>Search: <input type="text" id="lookup" /></label>
@@ -88,6 +88,7 @@
             <form id="newnoteform" method="POST" action="index.php?action=createnote">
                 <label>Title: </label><input type="text" id="newnotetitle" name="newnotetitle"/>
                 <input type="submit" class="btn btn-default btn-primary" value="Create"/>
+                <button type="button" class="btn btn-default btn-primary" value="Cancel" onclick="hideNewNote()">Cancel</button>
             </form>
         </div>
 

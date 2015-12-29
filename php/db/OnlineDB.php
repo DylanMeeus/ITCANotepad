@@ -187,6 +187,9 @@ class OnlineDB implements IDatabase
             $notedetails->setTitle($row['title']);
             $notedetails->setColour($row['colour']);
             $notedetails->setUserID($row['userID']);
+            if($row['opened'] != null){
+                $notedetails->setOpened($row['opened']);
+            }
             break; // there can't be more than one note tbh; really want to do an explicit goto here in asm? mh.
         }
 
@@ -206,6 +209,7 @@ class OnlineDB implements IDatabase
         $result = $statement->fetchAll();
 
         $users = array();
+        $rights = array();
         foreach ($result as $row)
         {
             $user = new User();
@@ -213,9 +217,10 @@ class OnlineDB implements IDatabase
             $username = $this->getUserDetails($row['userID'])->getUsername();
             $user->setUsername($username);
             array_push($users, $user);
+            array_push($rights, $row['rightID']);
         }
         $notedetails->setSharedUsers($users);
-        $notedetails->setSharedUsers($users);
+        $notedetails->setRights($rights);
         $this->closeConnection();
         return $notedetails;
     }
@@ -234,19 +239,33 @@ class OnlineDB implements IDatabase
         $this->closeConnection();
     }
 
-    public function addNote($userID, $title)
+    public function addNote($userID, $title, $opened = null)
     {
         $lastID = $this->getLastNoteID();
         $this->openConnection();
+        if($opened == null) {
 
-        $sql = "insert into notes(title,userID) values(?,?)";
-        $statement = $this->con->prepare($sql);
-        $statement->bindParam(1, $title);
-        $statement->bindParam(2, $userID);
-        $statement->execute();
-        $newnote = new Note();
-        $newnote->setID($lastID + 1);
-        $newnote->setTitle($title);
+            $sql = "insert into notes(title,userID) values(?,?)";
+            $statement = $this->con->prepare($sql);
+            $statement->bindParam(1, $title);
+            $statement->bindParam(2, $userID);
+            $statement->execute();
+            $newnote = new Note();
+            $newnote->setID($lastID + 1);
+            $newnote->setTitle($title);
+            $this->closeConnection();
+            return $newnote;
+        }
+        else{
+            $sql = "insert into notes(title,userID,opened) values(?,?, 1)";
+            $statement = $this->con->prepare($sql);
+            $statement->bindParam(1, $title);
+            $statement->bindParam(2, $userID);
+            $statement->execute();
+            $newnote = new Note();
+            $newnote->setID($lastID + 1);
+            $newnote->setTitle($title);
+        }
         $this->closeConnection();
         return $newnote;
     }
@@ -280,8 +299,8 @@ class OnlineDB implements IDatabase
         $statement->setFetchMode(PDO::FETCH_ASSOC);
         $result = $statement->fetchAll();
 
-            foreach ($result as $row)
-            {
+        foreach ($result as $row)
+        {
             $id = $row['m'];
             break;
         }
@@ -340,6 +359,34 @@ class OnlineDB implements IDatabase
 
     }
 
+    public function getUsers()
+    {
+        $this->openConnection();
+
+        $sql = "select * from users";
+
+        $statement = $this->con->prepare($sql);
+
+        $statement->execute();
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll();
+        $users = array();
+        foreach ($result as $row)
+        {
+            $user = new User();
+            $user->setID($row['id']);
+            $user->setUsername($row['username']);
+            $user->setAPIKey($row['apikey']);
+            array_push($users, $user);
+        }
+
+
+        $this->closeConnection();
+        return $users;
+
+
+    }
+
     public function getUserFromUsername($username)
     {
         // return user from username
@@ -378,7 +425,6 @@ class OnlineDB implements IDatabase
         $statement->bindParam(3, $noteID);
         $statement->execute();
         $this->closeConnection();
-
     }
 
 
@@ -489,7 +535,7 @@ class OnlineDB implements IDatabase
             }
             $this->closeConnection();
             $this->attachKeyToUser($userID, $lastKey);
-        //    return true; // We can just fall through end return true.
+            //    return true; // We can just fall through end return true.
         }
 
         return true; // if we got here without errors, we can return true.
@@ -508,10 +554,27 @@ class OnlineDB implements IDatabase
         $this->closeConnection();
     }
 
+    public function openSharedNote($noteID){
+        $this->openConnection();
+        $sql = "update notes set opened = 1 where noteID = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1, $noteID);
+        $statement->execute();
+        $this->closeConnection();
+    }
+
+    public function closeSharedNote($noteID){
+        $this->openConnection();
+        $sql = "update notes set opened = 0 where noteID = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1, $noteID);
+        $statement->execute();
+        $this->closeConnection();
+    }
+
     public function addSharedNote($userID, $users, $title, $rightIDList)
     {
-        $this->addNote($userID, $title);
-
+        $this->addNote($userID, $title, true);
         $lastID = $this->getLastNoteID();
         $this->openConnection();
         $rightID = 1;
@@ -525,9 +588,6 @@ class OnlineDB implements IDatabase
         $newSharedNote->setID($lastID);
         $newSharedNote->setUserID($userID);
         $newSharedNote->setTitle($title);
-
-
-
         for($i = 0; $i < sizeof($users); $i++){
             $sql = "insert into sharednotes(sharednoteID,userID,rightID) values(?,?,?)";
             $statement = $this->con->prepare($sql);
@@ -539,7 +599,6 @@ class OnlineDB implements IDatabase
         $user = $this->getUserDetails($userID);
         array_unshift($users, $user);
         $newSharedNote->setSharedUsers($users);
-
         $this->closeConnection();
         return $newSharedNote;
     }
@@ -571,7 +630,7 @@ class OnlineDB implements IDatabase
             $user->setID($row['id']);
             $user->setAPIKey($row['apikey']);
             $user->setUsername($row['username']);
-           break; // there can't be more than one user tbh; really want to do an explicit goto here in asm? mh.
+            break; // there can't be more than one user tbh; really want to do an explicit goto here in asm? mh.
         }
 
         $this->closeConnection();
@@ -614,6 +673,59 @@ class OnlineDB implements IDatabase
         }
         $this->closeConnection();
         return $unique;
+    }
+
+    public function isUniqueNoteTitle($userID, $title){
+        $this->openConnection();
+
+        $sql = "select * from notes where userID = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1,$userID);
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $statement->execute();
+        $results = $statement->fetchAll();
+        $unique = true;
+        foreach ($results as $row)
+        {
+            if($title === $row['title']){
+                $unique = false;
+                break;
+            }
+        }
+        if($unique){
+            $sql = "select sharednoteID, sh.userID as sharedID, rightID, title, notetext, colour, n.userID as ownerID from sharednotes sh JOIN notes n ON sharednoteID = noteID where sh.userID = ?";
+            $statement = $this->con->prepare($sql);
+            $statement->bindParam(1,$userID);
+            $statement->setFetchMode(PDO::FETCH_ASSOC);
+            $statement->execute();
+            $results = $statement->fetchAll();
+            foreach ($results as $row)
+            {
+                if($title === $row['title']){
+                    $unique = false;
+                    break;
+                }
+            }
+        }
+        $this->closeConnection();
+        return $unique;
+    }
+
+    public function makeShared($noteID, $userID)
+    {
+
+        $this->openConnection();
+        $rightID = 1;
+        $sql = "insert into sharednotes(sharednoteID,userID,rightID) values(?,?,?)";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1, $noteID);
+        $statement->bindParam(2, $userID);
+        $statement->bindParam(3, $rightID);
+        $statement->execute();
+        $newSharedNote = $this->getSharedNoteDetails($noteID);
+
+        $this->closeConnection();
+        return $newSharedNote;
     }
 
     public function createPasswordRecovery($mail, $recoveryString)
@@ -692,4 +804,7 @@ class OnlineDB implements IDatabase
         $this->closeConnection();
         return $id;
     }
+
+
+
 }
