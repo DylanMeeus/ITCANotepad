@@ -75,7 +75,7 @@ class OnlineDB implements IDatabase
     {
         $this->openConnection();
 
-        $sql = "select * from notes n LEFT join sharednotes sh on n.noteID = sh.sharednoteID where sh.sharednoteID IS NULL and n.userID = ?";
+        $sql = "select * from notes where userID = ?";
         $statement = $this->con->prepare($sql);
         $statement->bindParam(1, $userID);
         $statement->execute();
@@ -100,7 +100,7 @@ class OnlineDB implements IDatabase
     {
         $this->openConnection();
 
-        $sql = "select sharednoteID, sh.userID as sharedID, rightID, title, notetext, colour, n.userID as ownerID from sharednotes sh JOIN notes n ON sharednoteID = noteID where sh.userID = ?";
+        $sql = "select sharednoteID, sharednotes.userID as sharedID, rightID, title, notetext, colour, notes.userID as ownerID from sharednotes JOIN notes ON sharednoteID = noteID where sharednotes.userID = ?";
 
         $statement = $this->con->prepare($sql);
         $statement->bindParam(1, $userID);
@@ -157,7 +157,8 @@ class OnlineDB implements IDatabase
     public function addSharedUsers($noteID, $users, $rightIDList)
     {
         $this->openConnection();
-        for($i = 0; $i < sizeof($users);$i++){
+        for($i = 0; $i < sizeof($users);$i++)
+        {
             $sql = "insert into sharednotes(sharednoteID,userID,rightID) values(?,?,?)";
             $statement = $this->con->prepare($sql);
             $statement->bindParam(1, $noteID);
@@ -693,7 +694,7 @@ class OnlineDB implements IDatabase
             }
         }
         if($unique){
-            $sql = "select sharednoteID, sh.userID as sharedID, rightID, title, notetext, colour, n.userID as ownerID from sharednotes sh JOIN notes n ON sharednoteID = noteID where sh.userID = ?";
+            $sql = "select sharednoteID, sharednotes.userID as sharedID, rightID, title, notetext, colour, notes.userID as ownerID from sharednotes  JOIN notes  ON sharednoteID = noteID where sharednotes.userID = ?";
             $statement = $this->con->prepare($sql);
             $statement->bindParam(1,$userID);
             $statement->setFetchMode(PDO::FETCH_ASSOC);
@@ -734,7 +735,7 @@ class OnlineDB implements IDatabase
         $userID = $this->getIDFromMail($mail);
         if($userID==-1)
         {
-            return false; // ?o user was found with this mail.
+            return false; // No user was found with this mail.
         }
         $recoveryString = $userID.'-'.$recoveryString; // add userID for uniqueness. the - was superfluous due to the ID being stored in the table though.
         $this->openConnection();
