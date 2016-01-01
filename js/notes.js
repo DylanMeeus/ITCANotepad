@@ -43,7 +43,7 @@ function setupPage()
 
     $("#notelist").hide().fadeIn(1500);
     // apply fade-in to the other div?
-    noteLookup();
+
 }
 
 function hideNewNote(){
@@ -354,6 +354,7 @@ function sendNoteAsMail()
 
 
 // FAVICON STUFF (which doesn't work unfortunately)
+/*
 
 jQuery.fn.favicons = function (conf) {
     var config = jQuery.extend({
@@ -389,7 +390,8 @@ function getIcons()
     jQuery('#oldlinks').favicons({insert: 'insertBefore'});
 
 }
-
+*/
+/*
 function noteLookup(){
     var note = document.getElementById("lookup").value;
         $.ajax({
@@ -400,8 +402,8 @@ function noteLookup(){
             }
         });
 }
-
-window.onload=getIcons();
+*/
+//window.onload=getIcons();
 
 $(window).bind('keydown',function(event){
     if (event.ctrlKey || event.metaKey) {
@@ -413,3 +415,15 @@ $(window).bind('keydown',function(event){
         }
     }
 });
+
+function applyfilter() // apply a search filter
+{
+    console.log("filtering");
+}
+
+
+$('#filter').on('input',function(){
+    console.log("filter");
+});
+
+

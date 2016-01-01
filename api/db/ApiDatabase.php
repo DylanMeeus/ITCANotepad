@@ -4,8 +4,8 @@ require_once "db/IApiDatabase.php";
 class ApiDatabase implements IApiDatabase{
 
     private $servername = "it-ca.net";
-    private $username = "itca_global";
-    private $password = "xgkzl9Af!pLv";
+    private $username = "itca_Insanity";
+    private $password = 't&Musk$StEJ[';
     private $con;
 
 
@@ -22,7 +22,7 @@ class ApiDatabase implements IApiDatabase{
     {
         try
         {
-            $this->con = new PDO("mysql:host=" . $this->servername . ";dbname=itca_notedb", $this->username, $this->password);
+            $this->con = new PDO("mysql:host=" . $this->servername . ";dbname=itca_ghostnotes", $this->username, $this->password);
             $this->con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (Exception $ex)
         {
@@ -65,16 +65,29 @@ class ApiDatabase implements IApiDatabase{
         $this->closeConnection();
     }
 
-    public  function getUserNotes($userid)
+    public  function getUserNotes($userID)
     {
         $this->openConnection();
 
-
         $sql = "select * from notes where userID = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1, $userID);
+        $statement->execute();
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll();
 
-
-
+        $notes = array();
+        foreach ($result as $row)
+        {
+            $note = new Note();
+            $note->setID($row['noteID']);
+            $note->setTitle($row['title']);
+            $note->setText($row['notetext']);
+            $note->setColour($row['colour']);
+            array_push($notes, $note);
+        }
         $this->closeConnection();
+        return $notes;
     }
 }
 

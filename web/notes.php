@@ -20,6 +20,7 @@
     <link href="css/customcss.css" rel="stylesheet">
   <!--  <link href="css/cover.css" rel="stylesheet"> TRY THIS FOR A DARK  TEMPLATE -->
 
+    <script type="text/javascript" src="js/jquery.js"></script>
 
     <script type="text/javascript" src="js/notes.js"></script>
 
@@ -80,7 +81,7 @@
     <input type="button" class="btn btn-lg btn-primary btn-block" value="New note" onclick="createNote()">
     <br/>
     <div class="clearfix">
-        <label>Search: <input type="text" id="lookup" /></label>
+        <label>Search: <input type="text" id="filter" name="filter" /></label>
 
     </div>
     <br/>
