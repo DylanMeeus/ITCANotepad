@@ -79,28 +79,6 @@ class notepadapi
         }
         $xmlString .= "</note>";
         echo $xmlString;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
     }
 
     private function authenticate()

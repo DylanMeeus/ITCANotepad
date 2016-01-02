@@ -80,9 +80,8 @@
 
     <input type="button" class="btn btn-lg btn-primary btn-block" value="New note" onclick="createNote()">
     <br/>
-    <div class="clearfix">
+    <div class="clearfix" id="searchdiv">
         <label>Search: <input type="text" id="filter" name="filter" /></label>
-
     </div>
     <br/>
         <div id="newnotediv">

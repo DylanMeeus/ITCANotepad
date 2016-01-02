@@ -30,7 +30,7 @@
     <![endif]-->
 </head>
 
-<body onload="setupPage(), getUsernames()">
+<body onload="setupPage()">
 
 
 <div class="container">
@@ -79,7 +79,7 @@
                 <p class="lead" style="color:red"><?php echo $error?></p>
 
             <?php }} ?>
-       <label>Search: <input type="text" id="lookup" /></label>
+       <label>Search: <input type="text" id="filter" /></label>
     </div>
     <br/>
     <div id="newnotediv">

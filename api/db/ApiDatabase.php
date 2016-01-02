@@ -9,7 +9,8 @@ class ApiDatabase implements IApiDatabase{
     private $con;
 
 
-    public function __construct(){
+    public function __construct()
+    {
 
     }
 

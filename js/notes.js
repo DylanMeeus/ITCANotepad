@@ -37,8 +37,19 @@ function doBounce(element, times, distance, speed) {
     }
 }
 
+function setupSharedNotePage()
+{
+    setupPage();
+    getUsernames();
+}
+
 function setupPage()
 {
+
+    $('#filter').on('input',function(){
+        applyfilter();
+    });
+
     hideNewNote();
 
     $("#notelist").hide().fadeIn(1500);
@@ -353,44 +364,6 @@ function sendNoteAsMail()
 
 
 
-// FAVICON STUFF (which doesn't work unfortunately)
-/*
-
-jQuery.fn.favicons = function (conf) {
-    var config = jQuery.extend({
-        insert:        'appendTo',
-        defaultIco: 'favicon.png'
-    }, conf);
-
-    return this.each(function () {
-        jQuery('a[href^="http://"]', this).each(function () {
-            var link        = jQuery(this);
-            var faviconURL    = link.attr('href').replace(/^(http:\/\/[^\/]+).*$/, '$1') + '/favicon.ico';
-            var faviconIMG    = jQuery('<img src="' + config.defaultIco + '" alt="" />')[config.insert](link);
-            var extImg        = new Image();
-
-            extImg.src = faviconURL;
-
-            if (extImg.complete) {
-                alert("complete");
-                faviconIMG.attr('src', faviconURL);
-            }
-            else {
-                extImg.onload = function () {
-                    faviconIMG.attr('src', faviconURL);
-                };
-            }
-        });
-    });
-};
-
-function getIcons()
-{
-    console.log("Getting icons <3");
-    jQuery('#oldlinks').favicons({insert: 'insertBefore'});
-
-}
-*/
 /*
 function noteLookup(){
     var note = document.getElementById("lookup").value;
@@ -418,12 +391,32 @@ $(window).bind('keydown',function(event){
 
 function applyfilter() // apply a search filter
 {
-    console.log("filtering");
+    // regex based on the input?
+    // first we get all the entries of notes on this page.
+    var links = ($(".notelink"));
+
+    if($("#filter").val()!="")
+    {
+        for (var i = 0; i < links.length; i++) {
+            if (links[i].innerHTML.indexOf($("#filter").val()) > -1) {
+                // these ones have to be visible, the other invisible
+                links[i].style.background = "#33ff33";
+                /* Create a list above the normal list? */
+            }
+            else {
+                //links[i].style.visibility="hidden";
+                links[i].style.background = "#fff";
+            }
+        }
+    }
+    else
+    {
+        for(var i = 0; i < links.length; i++)
+        {
+        links[i].style.background = "#fff";
+        }
+    }
 }
 
-
-$('#filter').on('input',function(){
-    console.log("filter");
-});
 
 
