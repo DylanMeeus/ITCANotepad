@@ -425,7 +425,12 @@ class Servlet
 
             $this->isUniqueUsername();
             $this->redirect = false;
-        } else
+        }
+        elseif($action == "closesharednote")
+        {
+            $this->closeSharedNote();
+        }
+        else
         {
             $nextPage = "errorpage.php";
         }

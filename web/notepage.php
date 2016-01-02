@@ -34,7 +34,7 @@
     <script type="text/javascript" src="jscolor/jscolor.js"></script>
 </head>
 
-<body onload="setupNoteDetailPage(), getUsernames()">
+<body onload="setupNoteDetailPage()">
 
 
 <input type="hidden" id="noteID" <?php echo "value=\"" . $this->note->getID() . "\""?>/>

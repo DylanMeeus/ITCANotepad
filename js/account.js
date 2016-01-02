@@ -42,7 +42,6 @@ function recoverPassword()
     if(mail != "")
     {
         $.ajax({
-
             type:"GET",
             url:"index.php?action=startpasswordrecovery&email="+mail,
             success:function(result){
@@ -73,10 +72,6 @@ function recoverPassword()
 
             }
         });
-
-
-
-
     }
     else
     {

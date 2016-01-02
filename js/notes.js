@@ -27,6 +27,7 @@ function setupNoteDetailPage()
         }
 
     saveNotes();
+    getUsernames();
 }
 
 
@@ -419,4 +420,21 @@ function applyfilter() // apply a search filter
 }
 
 
+function closeSharedNote()
+{
+    $.ajax({
+        url: "index.php?action=closesharednote&sharednoteid="+$("#noteID").val(),
+        type: "GET",
+        success: function (response) {
 
+        },
+        complete: function (response) {
+            console.log(response);
+        }
+    });
+}
+
+window.onbeforeunload = function(e)
+{
+    closeSharedNote();
+}

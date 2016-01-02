@@ -75,7 +75,6 @@
     <?php if($this->errors != null){
         foreach($this->errors as $error){ ?>
             <p class="lead" style="color:red"><?php echo $error?></p>
-
         <?php }} ?>
 
     <input type="button" class="btn btn-lg btn-primary btn-block" value="New note" onclick="createNote()">
