@@ -8,10 +8,10 @@ class Note {
     private $text;
     private $colour;
     private $userID;
-    private $owner;
     private $sharedusers;
     private $rights;
     private $opened;
+    private $ciphered;
 
     public function __construct()
     {
@@ -25,11 +25,10 @@ class Note {
     public function getColour(){return $this->colour;}
     public function getUserID(){return $this->userID;}
     public function getSharedUsers(){return $this->sharedusers;}
-    public function getOwner(){return $this->owner;}
     public function getRights(){return $this->rights;}
     public function isOpened(){ return $this->opened;}
+    public function isCiphered(){return $this->ciphered;}
 
-    public function setOwner($own){$this->owner = $own;}
     public function setID($noteid){$this->id = $noteid;}
     public function setTitle($t){$this->title = $t;}
     public function setText($t){$this->text=$t;}
@@ -38,4 +37,5 @@ class Note {
     public function setSharedUsers($list){$this->sharedusers = $list;}
     public function setRights($rightList){ $this->rights = $rightList;}
     public function setOpened($opened){ $this->opened = $opened;}
+    public function setCiphered($ciphered){$this->ciphered=$ciphered;}
 }

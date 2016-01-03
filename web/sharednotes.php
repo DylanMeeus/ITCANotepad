@@ -30,7 +30,7 @@
     <![endif]-->
 </head>
 
-<body onload="setupPage(), getUsernames()">
+<body onload="setupPage()">
 
 
 <div class="container">
@@ -79,17 +79,16 @@
                 <p class="lead" style="color:red"><?php echo $error?></p>
 
             <?php }} ?>
-       <label>Search: <input type="text" id="lookup" /></label>
+       <label>Search: <input type="text" id="filter" /></label>
     </div>
     <br/>
     <div id="newnotediv">
         <form id="newnoteform" method="POST" action="index.php?action=createsharednote">
             <label>Title: </label><input type="text" id="newnotetitle" name="newnotetitle"/>
             <br/><br/>
+            <label>Share with:</label>
+            <br/><br/>
             <div id="users">
-                <label>Share with:</label>
-                <br/><br/>
-            </select>
             </div>
             <br/>
             <input type="button" class="btn btn-default btn-primary" value="Add user" onclick="addUserAtOverview()"/>

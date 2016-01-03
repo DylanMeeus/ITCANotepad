@@ -1,17 +1,13 @@
 /**
- * Created by Dylan on 1/08/2015.
+ * Created by Dylan
  */
-
-
 
 var saved = true;
 var extraButtons = false;
 var sharedUsers = 1;
-var datalist = false;
 var usernames;
 function setupNoteDetailPage()
 {
-    document.getElementById("adduserbutton").style.display = 'none';
     var x = document.getElementById("newlinkdiv");
  //   x.style.visibility="hidden";
     $("#savedID").css('color','green');
@@ -27,6 +23,7 @@ function setupNoteDetailPage()
         }
 
     saveNotes();
+    getUsernames();
 }
 
 
@@ -37,13 +34,25 @@ function doBounce(element, times, distance, speed) {
     }
 }
 
+function setupSharedNotePage()
+{
+    setupPage();
+    document.getElementById("adduserbutton").style.display = 'none';
+    getUsernames();
+}
+
 function setupPage()
 {
-    hideNewNote();
 
+    $('#filter').on('input',function(){
+        applyfilter();
+    });
+
+    hideNewNote();
+    getUsernames();
     $("#notelist").hide().fadeIn(1500);
     // apply fade-in to the other div?
-    noteLookup();
+
 }
 
 function hideNewNote(){
@@ -176,7 +185,7 @@ function addUser(element){
 
     txt.attr("list", "usernames" + sharedUsers);
 
-    if(!extraButtons){
+   if(!extraButtons){
         $("#adduser").display = 'block';
         appendButtons(element);
         extraButtons = true;
@@ -298,17 +307,14 @@ function saveNotes()
     saved = true;
     $("#savedID").css('color','green');
     console.log("saving notes");
+
     $.ajax({
         url:"index.php?action=savenote",
         type:'POST',
-        data : {textData : $('#textid').val(), titleData : $("#titleid").val(), noteid:$("#noteID").val(), colour:$("#colourid").val()},
+        data : {textData : $('#textid').val(), titleData : $("#titleid").val(), noteid:$("#noteID").val(), colour:$("#colourid").val(), cipher:document.getElementById("cipherbox").checked},
         success: function()
         {
                 setTimeout(saveNotes, 1000)
-        },
-        complete: function(response)
-        {
-
         }
     })
 }
@@ -348,60 +354,7 @@ function sendNoteAsMail()
 });
 }
 
-
-
-
-
-
-// FAVICON STUFF (which doesn't work unfortunately)
-
-jQuery.fn.favicons = function (conf) {
-    var config = jQuery.extend({
-        insert:        'appendTo',
-        defaultIco: 'favicon.png'
-    }, conf);
-
-    return this.each(function () {
-        jQuery('a[href^="http://"]', this).each(function () {
-            var link        = jQuery(this);
-            var faviconURL    = link.attr('href').replace(/^(http:\/\/[^\/]+).*$/, '$1') + '/favicon.ico';
-            var faviconIMG    = jQuery('<img src="' + config.defaultIco + '" alt="" />')[config.insert](link);
-            var extImg        = new Image();
-
-            extImg.src = faviconURL;
-
-            if (extImg.complete) {
-                alert("complete");
-                faviconIMG.attr('src', faviconURL);
-            }
-            else {
-                extImg.onload = function () {
-                    faviconIMG.attr('src', faviconURL);
-                };
-            }
-        });
-    });
-};
-
-function getIcons()
-{
-    console.log("Getting icons <3");
-    jQuery('#oldlinks').favicons({insert: 'insertBefore'});
-
-}
-
-function noteLookup(){
-    var note = document.getElementById("lookup").value;
-        $.ajax({
-            type: "GET",
-            url: "index.php?action=notelookup&word=" + note,
-            success: function (result) {
-                setTimeout(function(){noteLookup();}, 3000);
-            }
-        });
-}
-
-window.onload=getIcons();
+//window.onload=getIcons();
 
 $(window).bind('keydown',function(event){
     if (event.ctrlKey || event.metaKey) {
@@ -413,3 +366,51 @@ $(window).bind('keydown',function(event){
         }
     }
 });
+
+function applyfilter() // apply a search filter
+{
+    // first we get all the entries of notes on this page.
+    var links = ($(".notelink"));
+
+    if($("#filter").val()!="")
+    {
+        for (var i = 0; i < links.length; i++) {
+            if (links[i].innerHTML.indexOf($("#filter").val()) > -1) {
+                // these ones have to be visible, the other invisible
+                links[i].style.background = "#33ff33";
+                /* Create a list above the normal list? */
+            }
+            else {
+                //links[i].style.visibility="hidden";
+                links[i].style.background = "#fff";
+            }
+        }
+    }
+    else
+    {
+        for(var i = 0; i < links.length; i++)
+        {
+        links[i].style.background = "#fff";
+        }
+    }
+}
+
+
+function closeSharedNote()
+{
+    $.ajax({
+        url: "index.php?action=closesharednote&sharednoteid="+$("#noteID").val(),
+        type: "GET",
+        success: function (response) {
+
+        },
+        complete: function (response) {
+            console.log(response);
+        }
+    });
+}
+
+window.onbeforeunload = function(e)
+{
+    closeSharedNote();
+}

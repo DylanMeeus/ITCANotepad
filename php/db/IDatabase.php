@@ -22,7 +22,7 @@ interface IDatabase
     public function openSharedNote($noteID);
     public function closeSharedNote($noteID);
     public function deleteNote($noteID);
-    public function updateNote($noteID, $noteTitle, $noteText, $colour);
+    public function updateNote($noteID, $noteTitle, $noteText, $colour,$cipher);
     public function register($username,$password, $mail);
     public function getLinks($noteID);
     public function saveLink($noteID, $linkurl, $linkname);

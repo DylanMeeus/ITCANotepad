@@ -20,6 +20,7 @@
     <link href="css/customcss.css" rel="stylesheet">
   <!--  <link href="css/cover.css" rel="stylesheet"> TRY THIS FOR A DARK  TEMPLATE -->
 
+    <script type="text/javascript" src="js/jquery.js"></script>
 
     <script type="text/javascript" src="js/notes.js"></script>
 
@@ -74,14 +75,12 @@
     <?php if($this->errors != null){
         foreach($this->errors as $error){ ?>
             <p class="lead" style="color:red"><?php echo $error?></p>
-
         <?php }} ?>
 
     <input type="button" class="btn btn-lg btn-primary btn-block" value="New note" onclick="createNote()">
     <br/>
-    <div class="clearfix">
-        <label>Search: <input type="text" id="lookup" /></label>
-
+    <div class="clearfix" id="searchdiv">
+        <label>Search: <input type="text" id="filter" name="filter" /></label>
     </div>
     <br/>
         <div id="newnotediv">

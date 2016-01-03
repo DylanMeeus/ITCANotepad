@@ -34,7 +34,7 @@
     <script type="text/javascript" src="jscolor/jscolor.js"></script>
 </head>
 
-<body onload="setupNoteDetailPage(), getUsernames()">
+<body onload="setupNoteDetailPage()">
 
 
 <input type="hidden" id="noteID" <?php echo "value=\"" . $this->note->getID() . "\""?>/>
@@ -78,9 +78,6 @@
     <div class="starter-template">
     </div>
 
-    <div id="navigation">
-   <!--     <a class="notelink" href="index.php?action=gotonotelist">My Notes</a> -->
-    </div>
 
 <!--    <h1>notepad!</h1> -->
 
@@ -102,12 +99,14 @@
 
         <?php }} ?>
 
-    <?php if($this->right == 1 || $this->right == 3){ ?>
+    <?php if($this->right == 1 || $this->right == 3 || $this->right == null)
+    { ?>
 
     <h3 id="savedID">Saved</h3>
 
     <div id="notetextdiv"  class="form-group">
         <input style="font-size:25px" type="text" id="titleid" <?php echo "value=\"" . $this->note->getTitle() ."\""?>/>  <label>Colour:<input id="colourid" class="color"></label>
+        <label> cipher: <input type="checkbox" name="cipherbox" id="cipherbox" value="cipher"/></label>
         <?php if($this->shared){ ?>
             <label>Shared users:</label>
             <?php foreach($this->note->getSharedUsers() as $user){ echo $user->getUsername();
@@ -143,6 +142,14 @@
             <?php
         }} ?>
 </div>
+        <?php if(!$this->shared){ ?>
+        <div id="makeshared">
+            <form id="makeshared" method="POST" action="index.php?action=makeshared">
+                <input type="hidden" id="noteID" name="noteID" <?php echo "value=\"" . $this->note->getID() . "\""?>/>
+                <input type="submit" class="btn btn-default btn-primary" value="Make Shared"/>
+            </form>
+        </div>
+    <?php } ?>
     <br/>
     <?php if($this->shared && $_SESSION["user"]->getID() == $this->note->getUserID()){ ?>
     <div id="addusers">
@@ -157,23 +164,8 @@
         <?php
     } ?>
         </div>
-    <?php if(!$this->shared){ ?>
-        <div id="makeshared">
-            <form id="makeshared" method="POST" action="index.php?action=makeshared">
-                <input type="hidden" id="noteID" name="noteID" <?php echo "value=\"" . $this->note->getID() . "\""?>/>
-                <input type="submit" class="btn btn-default btn-primary" value="Make Shared"/>
-                </form>
-        </div>
-    <?php } ?>
-        <!--
-        THIS FAVICON STUFF DOES NOT WORK.
-        <ul>
-    <li><a href="http://www.danwebb.net">google</a></li>
-        </ul>
-    </div>
-    <button onclick="getIcons()">ICON</button>
-    -->
-    <?php } else{ ?>
+
+    <?php  } else{ ?>
      <br/><br/><br/>
     <h1><?php echo $this->note->getTitle(); ?></h1>
     <label>Shared users:</label>
