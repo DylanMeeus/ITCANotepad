@@ -73,12 +73,20 @@ class Facade
 
     public function getNoteDetails($noteID)
     {
-        return $this->database->getNoteDetails($noteID);
+        $note =  $this->database->getNoteDetails($noteID);
+        if($note->isCiphered()){
+            $note->setText($this->decipher($note->getText()));
+        }
+        return $note;
     }
 
-    public function updateNote($noteID, $noteTitle, $noteText, $colour)
+    public function updateNote($noteID, $noteTitle, $noteText, $colour, $cipher)
     {
-        $this->database->updateNote($noteID, $noteTitle, $noteText, $colour);
+        if($cipher)
+        {
+            $noteText = $this->cipher($noteText);
+        }
+        $this->database->updateNote($noteID, $noteTitle, $noteText, $colour,$cipher);
     }
 
     public function deleteNote($noteID)
@@ -176,12 +184,12 @@ class Facade
 
     public function cipher($message)
     {
-        $this->cipher->cipher($message);
+        return $this->cipher->cipher($message);
     }
 
     public function decipher($message)
     {
-        $this->cipher->decipher($message);
+        return   $this->cipher->decipher($message);
     }
     /* Leave private functions at the bottom */
     private function encrypt($inputtext)

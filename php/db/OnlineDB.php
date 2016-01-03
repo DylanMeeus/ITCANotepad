@@ -188,6 +188,7 @@ class OnlineDB implements IDatabase
             $notedetails->setTitle($row['title']);
             $notedetails->setColour($row['colour']);
             $notedetails->setUserID($row['userID']);
+            $notedetails->setCiphered($row['ciphered']);
             if ($row['opened'] != null)
             {
                 $notedetails->setOpened($row['opened']);
@@ -228,16 +229,17 @@ class OnlineDB implements IDatabase
         return $notedetails;
     }
 
-    public function updateNote($noteID, $noteTitle, $noteText, $colour)
+    public function updateNote($noteID, $noteTitle, $noteText, $colour, $cipher)
     {
         $this->openConnection();
 
-        $sql = "update notes set title=?,notetext=?, colour=? where noteID=?";
+        $sql = "update notes set title=?,notetext=?, colour=?, ciphered = ? where noteID=?";
         $statement = $this->con->prepare($sql);
         $statement->bindParam(1, $noteTitle);
         $statement->bindParam(2, $noteText);
         $statement->bindParam(3, $colour);
-        $statement->bindParam(4, $noteID);
+        $statement->bindParam(4, $cipher);
+        $statement->bindParam(5, $noteID);
         $statement->execute();
         $this->closeConnection();
     }

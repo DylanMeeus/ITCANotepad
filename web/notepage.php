@@ -106,7 +106,7 @@
 
     <div id="notetextdiv"  class="form-group">
         <input style="font-size:25px" type="text" id="titleid" <?php echo "value=\"" . $this->note->getTitle() ."\""?>/>  <label>Colour:<input id="colourid" class="color"></label>
-        <label> cipher: <input type="checkbox" name="cipherbox" id="cipherbox" value="cipher?"/></label>
+        <label> cipher: <input type="checkbox" name="cipherbox" id="cipherbox" value="cipher"/></label>
         <?php if($this->shared){ ?>
             <label>Shared users:</label>
             <?php foreach($this->note->getSharedUsers() as $user){ echo $user->getUsername();

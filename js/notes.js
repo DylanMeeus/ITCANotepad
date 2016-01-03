@@ -307,17 +307,14 @@ function saveNotes()
     saved = true;
     $("#savedID").css('color','green');
     console.log("saving notes");
+
     $.ajax({
         url:"index.php?action=savenote",
         type:'POST',
-        data : {textData : $('#textid').val(), titleData : $("#titleid").val(), noteid:$("#noteID").val(), colour:$("#colourid").val()},
+        data : {textData : $('#textid').val(), titleData : $("#titleid").val(), noteid:$("#noteID").val(), colour:$("#colourid").val(), cipher:document.getElementById("cipherbox").checked},
         success: function()
         {
                 setTimeout(saveNotes, 1000)
-        },
-        complete: function(response)
-        {
-
         }
     })
 }

@@ -150,13 +150,12 @@ class Servlet
             }
         } elseif ($action == "savenote")
         {
-            $this->facade->cipher("Hey, Hello World!");
-            $this->facade->decipher("Hfy, Mklmx Cormd!");
             $noteID = $_POST['noteid'];
             $textData = $_POST['textData'];
             $titleData = $_POST['titleData'];
             $colour = $_POST['colour'];
-            $this->facade->updateNote($noteID, $titleData, $textData, $colour);
+            $cipher = $_POST['cipher'] == "true" ? true : false;
+            $this->facade->updateNote($noteID, $titleData, $textData, $colour,$cipher);
             $this->redirect = false;
         } elseif ($action == "createnote")
         {
