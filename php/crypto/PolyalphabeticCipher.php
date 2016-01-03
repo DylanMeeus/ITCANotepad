@@ -61,7 +61,7 @@ class PolyalphabeticCipher implements  ICipher
         $message = "";
         for($i = 0; $i < strlen($cipheredmessage);$i++)
         {
-            $message .= $this->getOldChar($message[$i],$this->key[$i%strlen($this->key)]);
+            $message .= $this->getOldChar($cipheredmessage[$i],$this->key[$i%strlen($this->key)]);
         }
         echo "deciphered message: " . $message;
     }
@@ -73,6 +73,35 @@ class PolyalphabeticCipher implements  ICipher
      */
     private function getOldChar($cipherchar, $keyValue)
     {
-
+        if(preg_match('/^[a-zA-Z]/',$cipherchar))
+        {
+            if(!ctype_upper($cipherchar))
+            {
+                $originalPos = strpos($this->alph,$cipherchar); // position of this character
+                $keyPos = strpos($this->key,$keyValue); // position of the key
+                $newPos = $originalPos-$keyPos;
+                if($newPos < 0)
+                {
+                    $newPos = strlen($this->alph)+$newPos;
+                }
+                return $this->alph[($newPos)];
+            }
+            else
+            {
+                $originalPos = strpos(strtoupper($this->alph),$cipherchar); // position of this character
+                $keyPos = strpos($this->key,$keyValue);
+                $newPos = $originalPos-$keyPos;
+                if($newPos < 0)
+                {
+                    $newPos = strlen($this->alph)+$newPos;
+                }
+                return strtoupper($this->alph[($newPos)]);
+            }
+        }
+        else
+        {
+            echo "unchanged char";
+            return $cipherchar;
+        }
     }
 }

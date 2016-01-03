@@ -153,6 +153,7 @@ class Servlet
         } elseif ($action == "savenote")
         {
             $this->facade->cipher("Hey, Hello World!");
+            $this->facade->decipher("Hfy, Mklmx Cormd!");
             $noteID = $_POST['noteid'];
             $textData = $_POST['textData'];
             $titleData = $_POST['titleData'];

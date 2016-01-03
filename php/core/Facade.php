@@ -179,6 +179,10 @@ class Facade
         $this->cipher->cipher($message);
     }
 
+    public function decipher($message)
+    {
+        $this->cipher->decipher($message);
+    }
     /* Leave private functions at the bottom */
     private function encrypt($inputtext)
     {
