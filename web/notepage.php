@@ -99,7 +99,8 @@
 
         <?php }} ?>
 
-    <?php if($this->right == 1 || $this->right == 3){ ?>
+    <?php if($this->right == 1 || $this->right == 3 || $this->right == null)
+    { ?>
 
     <h3 id="savedID">Saved</h3>
 
