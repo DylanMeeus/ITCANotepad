@@ -7,8 +7,6 @@ require_once "php/core/User.php";
 require_once "php/core/Note.php";
 
 
-// I SHOULD REFACTOR THIS STATEMACHINE INTO SOMETHING A BIT MORE..DECENTLY..
-
 class Servlet
 {
 

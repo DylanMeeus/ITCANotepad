@@ -92,9 +92,6 @@ class notepadapi
         {
             $authKey = $_POST['authkey'];
         }
-
-        // temp authkey = 1234;
-        // Get it form the database.
        $userID = $this->facade->authenticateKey($authKey);
        return $userID;
     }
