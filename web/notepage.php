@@ -142,6 +142,14 @@
             <?php
         }} ?>
 </div>
+        <?php if(!$this->shared){ ?>
+        <div id="makeshared">
+            <form id="makeshared" method="POST" action="index.php?action=makeshared">
+                <input type="hidden" id="noteID" name="noteID" <?php echo "value=\"" . $this->note->getID() . "\""?>/>
+                <input type="submit" class="btn btn-default btn-primary" value="Make Shared"/>
+            </form>
+        </div>
+    <?php } ?>
     <br/>
     <?php if($this->shared && $_SESSION["user"]->getID() == $this->note->getUserID()){ ?>
     <div id="addusers">
@@ -156,15 +164,8 @@
         <?php
     } ?>
         </div>
-    <?php if(!$this->shared){ ?>
-        <div id="makeshared">
-            <form id="makeshared" method="POST" action="index.php?action=makeshared">
-                <input type="hidden" id="noteID" name="noteID" <?php echo "value=\"" . $this->note->getID() . "\""?>/>
-                <input type="submit" class="btn btn-default btn-primary" value="Make Shared"/>
-                </form>
-        </div>
 
-    <?php } } else{ ?>
+    <?php  } else{ ?>
      <br/><br/><br/>
     <h1><?php echo $this->note->getTitle(); ?></h1>
     <label>Shared users:</label>
