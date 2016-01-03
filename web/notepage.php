@@ -163,16 +163,8 @@
                 <input type="submit" class="btn btn-default btn-primary" value="Make Shared"/>
                 </form>
         </div>
-    <?php } ?>
-        <!--
-        THIS FAVICON STUFF DOES NOT WORK.
-        <ul>
-    <li><a href="http://www.danwebb.net">google</a></li>
-        </ul>
-    </div>
-    <button onclick="getIcons()">ICON</button>
-    -->
-    <?php } else{ ?>
+
+    <?php } } else{ ?>
      <br/><br/><br/>
     <h1><?php echo $this->note->getTitle(); ?></h1>
     <label>Shared users:</label>

@@ -1,13 +1,10 @@
 /**
- * Created by Dylan on 1/08/2015.
+ * Created by Dylan
  */
-
-
 
 var saved = true;
 var extraButtons = false;
 var sharedUsers = 1;
-var datalist = false;
 var usernames;
 function setupNoteDetailPage()
 {
@@ -360,23 +357,6 @@ function sendNoteAsMail()
 });
 }
 
-
-
-
-
-
-/*
-function noteLookup(){
-    var note = document.getElementById("lookup").value;
-        $.ajax({
-            type: "GET",
-            url: "index.php?action=notelookup&word=" + note,
-            success: function (result) {
-                setTimeout(function(){noteLookup();}, 3000);
-            }
-        });
-}
-*/
 //window.onload=getIcons();
 
 $(window).bind('keydown',function(event){
@@ -392,7 +372,6 @@ $(window).bind('keydown',function(event){
 
 function applyfilter() // apply a search filter
 {
-    // regex based on the input?
     // first we get all the entries of notes on this page.
     var links = ($(".notelink"));
 

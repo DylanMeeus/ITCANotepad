@@ -185,9 +185,12 @@ class Facade
         return sha1($inputtext);
     }
 
+    /**
+     * Returns a random string based on the md5 hash of microtime and random.
+     * @return string
+     */
     private function generateRandomString()
     {
-        // we can just return another MD5 I think.
         return  md5(microtime().rand());
     }
 
