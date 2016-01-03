@@ -8,7 +8,6 @@ var sharedUsers = 1;
 var usernames;
 function setupNoteDetailPage()
 {
-    document.getElementById("adduserbutton").style.display = 'none';
     var x = document.getElementById("newlinkdiv");
  //   x.style.visibility="hidden";
     $("#savedID").css('color','green');
@@ -38,6 +37,7 @@ function doBounce(element, times, distance, speed) {
 function setupSharedNotePage()
 {
     setupPage();
+    document.getElementById("adduserbutton").style.display = 'none';
     getUsernames();
 }
 
