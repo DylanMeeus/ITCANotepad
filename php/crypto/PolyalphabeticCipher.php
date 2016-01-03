@@ -54,6 +54,9 @@ class PolyalphabeticCipher implements ICipher
         }
     }
 
+    /*
+     * deciphers the ciphered message.
+     */
     public function decipher($cipheredmessage)
     {
         // we loop over every letter in the message
@@ -66,7 +69,7 @@ class PolyalphabeticCipher implements ICipher
     }
 
     /**
-     * Gets the original value of the character.
+     * Gets the original value of the character. (just cyling through the alphabet in reverse, and using the index of the character in the key as a basis.
      * @param $cipherchar
      * @param $keyValue
      */
