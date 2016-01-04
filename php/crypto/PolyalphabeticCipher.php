@@ -6,6 +6,8 @@
  * Date: 13/12/2015
  * Time: 17:10
  */
+require_once "php/crypto/ICipher.php";
+
 class PolyalphabeticCipher implements ICipher
 {
 

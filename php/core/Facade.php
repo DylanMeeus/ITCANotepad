@@ -1,8 +1,8 @@
 <?php
 
 
-require_once "php/crypto/ICipher.php";
-require_once "php/crypto/PolyalphabeticCipher.php";
+//require_once "php/crypto/ICipher.php";
+//require_once "php/crypto/PolyalphabeticCipher.php";
 require_once "php/db/OnlineDB.php";
 require_once "php/db/IDatabase.php";
 require_once "php/factories/DBFactory.php";

@@ -92,13 +92,21 @@
         </div>
 
     <div id="notelist">
-        <?php   if($this->notes != null){ foreach ($this->notes as $note) {
+        <?php   if($this->notes != null){ foreach ($this->notes as $note) { ?>
+            <br/>
+            <?php if(!$note->isShared()){
             ?>
+
             <a style="color:#<?php echo $note->getColour()?>" class="notelink" href=<?php echo "index.php?action=opennote&noteid=" . $note->getID()?>> <?php echo  $note->getTitle() ?></a>
             <a class="deletenote" href=<?php echo "index.php?action=deletenote&noteid=" . $note->getID()?>> x</a>
-            </br>
+            <?php } else{ ?>
+
+                <p><a style="color:#<?php echo $note->getColour()?>" class="notelink" href=<?php echo "index.php?action=opensharednote&noteid=" . $note->getID()?>> <?php echo  $note->getTitle() ?></a>
+                <?php if($_SESSION["user"]->getID() == $note->getUserID()){ ?><a class="deletenote" href=<?php echo "index.php?action=deletesharednote&noteid=" . $note->getID()?>> x</a></p><?php } ?>
+
+            <?php }?>
             <?php
-        }} ?>
+        }?>  <?php } ?>
     </div>
 
     <div class="mastfoot">

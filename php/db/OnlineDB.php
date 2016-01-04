@@ -70,6 +70,28 @@ class OnlineDB implements IDatabase
 
     }
 
+    public function isNoteShared($noteID){
+        $this->openConnection();
+
+        $sql = "select userID from sharednotes where sharednoteID = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1, $noteID);
+        $statement->execute();
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll();
+
+        $shared = false;
+        foreach ($result as $row)
+        {
+            if($row['userID'] != null){
+                $shared = true;
+            }
+            break;
+        }
+        $this->closeConnection();
+        return $shared;
+    }
+
 
     public function getNotes($userID)
     {
@@ -81,19 +103,23 @@ class OnlineDB implements IDatabase
         $statement->execute();
         $statement->setFetchMode(PDO::FETCH_ASSOC);
         $result = $statement->fetchAll();
-
+        $sharednotes = $this->getSharedNotes($userID);
         $notes = array();
         foreach ($result as $row)
         {
-            $note = new Note();
-            $note->setID($row['noteID']);
-            $note->setTitle($row['title']);
-            $note->setText($row['notetext']);
-            $note->setColour($row['colour']);
-            array_push($notes, $note);
+                $note = new Note();
+                $note->setID($row['noteID']);
+                $note->setTitle($row['title']);
+                $note->setText($row['notetext']);
+                $note->setColour($row['colour']);
+                $note->setUserID($row['userID']);
+                $note->setShared($this->isNoteShared($note->getID()));
+                array_push($notes, $note);
+            //}
         }
+        $merge = array_merge($notes, $sharednotes);
         $this->closeConnection();
-        return $notes;
+        return $merge;
     }
 
     public function getSharedNotes($userID)
@@ -112,21 +138,25 @@ class OnlineDB implements IDatabase
 
         foreach ($result as $row)
         {
-            $note = new Note();
-            $note->setID($row['sharednoteID']);
-            $note->setTitle($row['title']);
-            $note->setText($row['notetext']);
-            $note->setColour($row['colour']);
-            $note->setUserID($row['ownerID']);
+            if($row['ownerID'] != $userID) {
 
-            $users = array();
-            $user = new User();
-            $user->setID($row['ownerID']);
-            $username = $this->getUserDetails($row['ownerID'])->getUsername();
-            $user->setUsername($username);
-            array_push($users, $user);
-            $note->setSharedUsers($users);
-            array_push($sharednotes, $note);
+                $note = new Note();
+                $note->setID($row['sharednoteID']);
+                $note->setTitle($row['title']);
+                $note->setText($row['notetext']);
+                $note->setColour($row['colour']);
+                $note->setShared($this->isNoteShared($note->getID()));
+                $note->setUserID($row['ownerID']);
+
+                $users = array();
+                $user = new User();
+                $user->setID($row['ownerID']);
+                $username = $this->getUserDetails($row['ownerID'])->getUsername();
+                $user->setUsername($username);
+                array_push($users, $user);
+                $note->setSharedUsers($users);
+                array_push($sharednotes, $note);
+            }
         }
         $this->closeConnection();
         return $sharednotes;

@@ -10,12 +10,14 @@ class Note {
     private $userID;
     private $sharedusers;
     private $rights;
+    private $shared;
     private $opened;
     private $ciphered;
 
     public function __construct()
     {
         $this->sharedusers = array();
+        $this->shared = false;
         $this->opened = false;
     }
 
@@ -26,7 +28,8 @@ class Note {
     public function getUserID(){return $this->userID;}
     public function getSharedUsers(){return $this->sharedusers;}
     public function getRights(){return $this->rights;}
-    public function isOpened(){ return $this->opened;}
+    public function isShared(){ return $this->shared;}
+    public function isOpened(){ return $this->shared;}
     public function isCiphered(){return $this->ciphered;}
 
     public function setID($noteid){$this->id = $noteid;}
@@ -36,6 +39,7 @@ class Note {
     public function setUserID($id){$this->userID = $id;}
     public function setSharedUsers($list){$this->sharedusers = $list;}
     public function setRights($rightList){ $this->rights = $rightList;}
+    public function setShared($shared){ $this->shared = $shared;}
     public function setOpened($opened){ $this->opened = $opened;}
     public function setCiphered($ciphered){$this->ciphered=$ciphered;}
 }
