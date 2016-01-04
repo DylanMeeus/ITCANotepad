@@ -44,6 +44,12 @@ function setupSharedNotePage()
 function setupPage()
 {
 
+
+    $('#filter').on('input',function(){
+        applyfilter();
+    });
+
+    hideNewNote();
     $('#filter').on('input',function(){
         applyfilter();
     });
