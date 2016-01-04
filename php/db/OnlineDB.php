@@ -103,19 +103,19 @@ class OnlineDB implements IDatabase
         $statement->execute();
         $statement->setFetchMode(PDO::FETCH_ASSOC);
         $result = $statement->fetchAll();
-        $sharednotes = $this->getSharedNotes($userID);
+        $sharednotes = $this->getSharedNotes($userID, true);
         $notes = array();
         foreach ($result as $row)
         {
+            if($row['userID'] != $userID && $this->isNoteShared($row['noteID'])){}
                 $note = new Note();
                 $note->setID($row['noteID']);
                 $note->setTitle($row['title']);
                 $note->setText($row['notetext']);
                 $note->setColour($row['colour']);
                 $note->setUserID($row['userID']);
-                $note->setShared($this->isNoteShared($note->getID()));
+                $note->setShared(false);
                 array_push($notes, $note);
-            //}
         }
         $merge = array_merge($notes, $sharednotes);
         $this->closeConnection();
@@ -138,8 +138,6 @@ class OnlineDB implements IDatabase
 
         foreach ($result as $row)
         {
-            if($row['ownerID'] != $userID) {
-
                 $note = new Note();
                 $note->setID($row['sharednoteID']);
                 $note->setTitle($row['title']);
@@ -157,7 +155,7 @@ class OnlineDB implements IDatabase
                 $note->setSharedUsers($users);
                 array_push($sharednotes, $note);
             }
-        }
+
         $this->closeConnection();
         return $sharednotes;
     }
