@@ -1,16 +1,23 @@
 <?php
 
+
+//require_once "php/crypto/ICipher.php";
+//require_once "php/crypto/PolyalphabeticCipher.php";
 require_once "php/db/OnlineDB.php";
 require_once "php/db/IDatabase.php";
 require_once "php/factories/DBFactory.php";
+require_once "php/factories/CipherFactory.php";
 class Facade
 {
     private $database;
     private $dbFactory;
+    private $cipher;
     public function __construct()
     {
         $this->dbFactory = new DBFactory();
         $this->database = $this->dbFactory->getDatabase();
+        $this->cipherFactory = new CipherFactory();
+        $this->cipher = $this->cipherFactory->getPolyalphabeticCipher();
     }
 
     public function login($username, $password)
@@ -40,6 +47,14 @@ class Facade
         return $this->database->getUserFromUsername($username);
     }
 
+    public function openSharedNote($noteID){
+        $this->database->openSharedNote($noteID);
+    }
+
+    public function closeSharedNote($noteID){
+        $this->database->closeSharedNote($noteID);
+    }
+
     public function deleteSharedNote($noteID){
         $this->database->deleteSharedNote($noteID);
     }
@@ -52,14 +67,26 @@ class Facade
         return $this->database->addSharedNote($userID, $users, $title, $rightIDList);
     }
 
-    public function getNoteDetails($noteID)
-    {
-        return $this->database->getNoteDetails($noteID);
+    public function getUsers(){
+        return $this->database->getUsers();
     }
 
-    public function updateNote($noteID, $noteTitle, $noteText, $colour)
+    public function getNoteDetails($noteID)
     {
-        $this->database->updateNote($noteID, $noteTitle, $noteText, $colour);
+        $note =  $this->database->getNoteDetails($noteID);
+        if($note->isCiphered()){
+            $note->setText($this->decipher($note->getText()));
+        }
+        return $note;
+    }
+
+    public function updateNote($noteID, $noteTitle, $noteText, $colour, $cipher)
+    {
+        if($cipher)
+        {
+            $noteText = $this->cipher($noteText);
+        }
+        $this->database->updateNote($noteID, $noteTitle, $noteText, $colour,$cipher);
     }
 
     public function deleteNote($noteID)
@@ -128,6 +155,15 @@ class Facade
         return $this->database->isUniqueUsername($username);
     }
 
+    public function isUniqueNotetitleForUser($userID, $title){
+
+        return $this->database->isUniqueNoteTitle($userID, $title);
+    }
+
+    public function makeShared($noteID, $userID){
+        return $this->database->makeShared($noteID, $userID);
+    }
+
     /*
      * Returns the recoveryString if the mail was found. False otherwise.
      */
@@ -143,18 +179,30 @@ class Facade
      */
     public function resetPassword($password,$recoveryString)
     {
-        return $this->database->resetPassword($password,$recoveryString);
+        return $this->database->resetPassword($this->encrypt($password),$recoveryString);
     }
 
+    public function cipher($message)
+    {
+        return $this->cipher->cipher($message);
+    }
+
+    public function decipher($message)
+    {
+        return   $this->cipher->decipher($message);
+    }
     /* Leave private functions at the bottom */
     private function encrypt($inputtext)
     {
         return sha1($inputtext);
     }
 
+    /**
+     * Returns a random string based on the md5 hash of microtime and random.
+     * @return string
+     */
     private function generateRandomString()
     {
-        // we can just return another MD5 I think.
         return  md5(microtime().rand());
     }
 

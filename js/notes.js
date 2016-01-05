@@ -1,14 +1,13 @@
 /**
- * Created by Dylan on 1/08/2015.
+ * Created by Dylan
  */
 
-
-
 var saved = true;
-var sharedUsers = 0;
+var extraButtons = false;
+var sharedUsers = 1;
+var usernames;
 function setupNoteDetailPage()
 {
-
     var x = document.getElementById("newlinkdiv");
  //   x.style.visibility="hidden";
     $("#savedID").css('color','green');
@@ -19,10 +18,12 @@ function setupNoteDetailPage()
 
     $("#colourid").val($("#originalColour").val());
     // before we bounce - we check the stuff
-    if($("#textid").val() == ""){
-        doBounce($("#containerdiv"), 3, '10px', 300);
-    }
+        if ($("#textid").val() == "") {
+            doBounce($("#containerdiv"), 3, '10px', 300);
+        }
+
     saveNotes();
+    getUsernames();
 }
 
 
@@ -33,26 +34,139 @@ function doBounce(element, times, distance, speed) {
     }
 }
 
-function setupPage()
+function setupSharedNotePage()
 {
-    document.getElementById("newnotediv").style.visibility="hidden";
-
-    $("#notelist").hide().fadeIn(1500);
-    // apply fade-in to the other div?
-    noteLookup();
+    setupPage();
+    document.getElementById("adduserbutton").style.display = 'none';
+    getUsernames();
 }
 
-function addUser(){
-    ++sharedUsers;
-    var txt = $("<input/>");
+function setupPage()
+{
+
+
+    $('#filter').on('input',function(){
+        applyfilter();
+    });
+
+    hideNewNote();
+    $('#filter').on('input',function(){
+        applyfilter();
+    });
+
+    hideNewNote();
+    getUsernames();
+    $("#notelist").hide().fadeIn(1500);
+    // apply fade-in to the other div?
+
+}
+
+function hideNewNote(){
+    hide(document.getElementById("newnotediv"));
+}
+
+function cancelUsers(){
+    var node = document.getElementById("users");
+    while(node.hasChildNodes()) {
+        node.removeChild(node.lastChild);
+    }
+    sharedUsers = 1;
+    document.getElementById("cancelbutton").style.display = 'none';
+    document.getElementById("removeuser").style.display = 'none';
+    document.getElementById("adduserbutton").style.display = 'none';
+}
+
+function hide (elements) {
+    elements = elements.length ? elements : [elements];
+    for (var index = 0; index < elements.length; index++) {
+        elements[index].style.display = 'none';
+    }
+}
+
+function createNote(){
+    show(document.getElementById("newnotediv"));
+}
+
+function show(elements){
+    elements = elements.length ? elements : [elements];
+    for (var index = 0; index < elements.length; index++) {
+            elements[index].style.display = 'block';
+    }
+
+    $("#adduser").display = 'none';
+}
+
+function getUsernames(){
+    $.ajax({
+        url: "index.php?action=getUsers",
+        type: "GET",
+        datatype: "json",
+        success: function (response) {
+
+            var responseString = response;
+            var escapedString = responseString.substring(1, responseString.length - 1).replace(/(['"])/g, "");
+            usernames = escapedString.split(",");
+        },
+        complete: function (response) {
+            // this just gets called when the ajax call is done. It's like the finally of a try-catch.
+            console.log(response);
+        }
+    });
+}
+
+function removeuser(){
+    //forbidden to delete first userfield (need to click cancel button to completely quit)
+    if(sharedUsers > 2) {
+        var node = document.getElementById("users");
+        node.removeChild(node.lastChild);
+        //we need to remove the <br> if it has just been added in the div
+        if(sharedUsers % 3 == 1){
+            node.removeChild(node.lastChild);
+        }
+        --sharedUsers;
+    }
+   // element.parentNode.removeChild(element);
+    /*$("users").last().remove();
+     $("users").last().remove();
+     $("users").last().remove();
+     $("users").last().remove();
+     //if there's 3 shared user-fields, we need to delete the <br> element as well
+     if (sharedUsers % 3 == 0) {
+     $("users").last().remove();
+     }*/
+}
+
+function addUserInNotepage(){
+    addUser($("#userform"));
+    $("#cancelbutton").click( function(){
+        cancelUsers();
+    });
+    if(extraButtons){
+        document.getElementById("cancelbutton").style.display = 'inline';
+        document.getElementById("removeuser").style.display = 'inline';
+        document.getElementById("adduserbutton").style.display = 'inline';
+    }
+}
+
+function addUserAtOverview(){
+    addUser($("#newnoteform"));
+    $("#cancelbutton").click( function(){
+        hideNewNote();
+    });
+}
+
+function addUser(element){
+
+    var userDiv = $("<div/>");
+    userDiv.attr("id", "user" + sharedUsers);
+
     var label = $("<label/>");
-
     label.text("User " + sharedUsers + ":");
+
+
     var select = $("<select/>");
-
-
     select.attr("id", "rightID" + sharedUsers)
-    .attr("name", "rightID" + sharedUsers);
+        .attr("name", "rightID" + sharedUsers);
     select.append($("<option></option>")
         .attr("value",2)
         .text("Read"));
@@ -61,22 +175,68 @@ function addUser(){
         .attr("selected", "selected")
         .text("Read/Write"));
 
-
-
+    var txt = $("<input/>");
     txt.attr("type", "text");
-    txt.attr("id", "user" + sharedUsers);
-    txt.attr("name", "user" + sharedUsers);
-        $("#users").append(label)
-            .append(txt)
-            .append(select)
-            .append("&nbsp;");
-        if (sharedUsers % 3 == 0) {
-            var br = $("<br/>");
-            $("#users").append(br);
-        }
+    txt.attr("id", "username" + sharedUsers);
+    txt.attr("name", "username" + sharedUsers);
 
+    var usernameList = $("<datalist/>");
+    usernameList.attr("id", "usernames" + sharedUsers);
+
+    for (var i = 0; i < usernames.length; i++) {
+        usernameList.append($("<option></option>")
+            .attr("value", usernames[i])
+            .text(usernames[i]));
+    }
+
+    txt.attr("list", "usernames" + sharedUsers);
+
+   if(!extraButtons){
+        $("#adduser").display = 'block';
+        appendButtons(element);
+        extraButtons = true;
+    }
+
+
+    userDiv.append(usernameList)
+        .append(label)
+        .append(txt)
+        .append(select)
+        .append("&nbsp;");
+
+    $("#users").append(userDiv);
+    document.getElementById("user" + sharedUsers).style.display = 'inline';
+    if(sharedUsers % 3 == 0){
+        var br = $("<br/>");
+        $("#users").append(br);
+    }
+    sharedUsers++;
 }
 
+function appendButtons(element){
+    var removeUser = $("<button/>");
+    removeUser.attr("id", "removeuser");
+    removeUser.attr("type", "button");
+    removeUser.attr("class", "btn btn-default btn-primary");
+    removeUser.text("Delete last user");
+    var cancel = $("<button/>");
+    cancel.attr("id", "cancelbutton");
+    cancel.attr("class", "btn btn-default btn-primary");
+    cancel.attr("type", "button");
+    cancel.text("Cancel");
+    /* var submit = $("<input/>");
+     submit.attr("class", "btn btn-default btn-primary");
+     submit.attr("value", "Create");*/
+    var br = $("<br/>");
+    element.append(removeUser)
+        .append("&nbsp;");
+    /* $("#newnoteform").append(submit)
+     .append("&nbsp;");*/
+    element.append(cancel);
+    $("#removeuser").click( function(){
+        removeuser();
+    });
+}
 
 function saveLink()
 {
@@ -144,27 +304,7 @@ function deleteLink(id)
 }
 
 
-function deleteNote(id)
-{
 
-}
-
-function newnotepopup()
-{/*
-    var titlelabel = document.createElement("label");
-    titlelabel.innerHTML="title: ";
-    var titleField = document.createElement("input");
-    titleField.setAttribute("type","text");
-    titlelabel.appendChild(titleField);
-    var createButton = document.createElement("input");
-    createButton.setAttribute("type","submit");
-    createButton.setAttribute("onclick","createNote()");
-    var form = document.getElementById("newnoteform");
-    form.appendChild(titlelabel);
-    form.appendChild(createButton);
-    */
-    document.getElementById("newnotediv").style.visibility="visible";
-}
 
 
 function saveNotes()
@@ -173,17 +313,14 @@ function saveNotes()
     saved = true;
     $("#savedID").css('color','green');
     console.log("saving notes");
+
     $.ajax({
         url:"index.php?action=savenote",
         type:'POST',
-        data : {textData : $('#textid').val(), titleData : $("#titleid").val(), noteid:$("#noteID").val(), colour:$("#colourid").val()},
+        data : {textData : $('#textid').val(), titleData : $("#titleid").val(), noteid:$("#noteID").val(), colour:$("#colourid").val(), cipher:document.getElementById("cipherbox").checked},
         success: function()
         {
                 setTimeout(saveNotes, 1000)
-        },
-        complete: function(response)
-        {
-
         }
     })
 }
@@ -223,60 +360,7 @@ function sendNoteAsMail()
 });
 }
 
-
-
-
-
-
-// FAVICON STUFF (which doesn't work unfortunately)
-
-jQuery.fn.favicons = function (conf) {
-    var config = jQuery.extend({
-        insert:        'appendTo',
-        defaultIco: 'favicon.png'
-    }, conf);
-
-    return this.each(function () {
-        jQuery('a[href^="http://"]', this).each(function () {
-            var link        = jQuery(this);
-            var faviconURL    = link.attr('href').replace(/^(http:\/\/[^\/]+).*$/, '$1') + '/favicon.ico';
-            var faviconIMG    = jQuery('<img src="' + config.defaultIco + '" alt="" />')[config.insert](link);
-            var extImg        = new Image();
-
-            extImg.src = faviconURL;
-
-            if (extImg.complete) {
-                alert("complete");
-                faviconIMG.attr('src', faviconURL);
-            }
-            else {
-                extImg.onload = function () {
-                    faviconIMG.attr('src', faviconURL);
-                };
-            }
-        });
-    });
-};
-
-function getIcons()
-{
-    console.log("Getting icons <3");
-    jQuery('#oldlinks').favicons({insert: 'insertBefore'});
-
-}
-
-function noteLookup(){
-    var note = document.getElementById("lookup").value;
-        $.ajax({
-            type: "GET",
-            url: "index.php?action=notelookup&word=" + note,
-            success: function (result) {
-                setTimeout(function(){noteLookup();}, 3000);
-            }
-        });
-}
-
-window.onload=getIcons();
+//window.onload=getIcons();
 
 $(window).bind('keydown',function(event){
     if (event.ctrlKey || event.metaKey) {
@@ -288,3 +372,51 @@ $(window).bind('keydown',function(event){
         }
     }
 });
+
+function applyfilter() // apply a search filter
+{
+    // first we get all the entries of notes on this page.
+    var links = ($(".notelink"));
+
+    if($("#filter").val()!="")
+    {
+        for (var i = 0; i < links.length; i++) {
+            if (links[i].innerHTML.indexOf($("#filter").val()) > -1) {
+                // these ones have to be visible, the other invisible
+                links[i].style.background = "#33ff33";
+                /* Create a list above the normal list? */
+            }
+            else {
+                //links[i].style.visibility="hidden";
+                links[i].style.background = "#fff";
+            }
+        }
+    }
+    else
+    {
+        for(var i = 0; i < links.length; i++)
+        {
+        links[i].style.background = "#fff";
+        }
+    }
+}
+
+
+function closeSharedNote()
+{
+    $.ajax({
+        url: "index.php?action=closesharednote&sharednoteid="+$("#noteID").val(),
+        type: "GET",
+        success: function (response) {
+
+        },
+        complete: function (response) {
+            console.log(response);
+        }
+    });
+}
+
+window.onbeforeunload = function(e)
+{
+    closeSharedNote();
+}

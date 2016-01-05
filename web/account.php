@@ -84,7 +84,7 @@
     <h1>Account Hub</h1>
 
     <input type="button" class="btn btn-lg btn-primary btn-block" value="Change Password"
-           onclick="location.href='index.php?action=gotochangepassword'">
+           onclick="location.href='../index.php'">
     </br>
 
     <?php

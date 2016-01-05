@@ -64,7 +64,7 @@
         counter.innerHTML = seconds + "...";
         seconds -= 1;
         if(seconds==0)
-        window.location="index.php?action=gotologin";
+        window.location="../index.php";
     }
 </script>
 </body>

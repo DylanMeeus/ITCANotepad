@@ -34,15 +34,22 @@ class notepadapi
             {
                 $action = isset($_POST['action']);
             }
-
+            echo "action: " + $action;
             switch($action)
             {
-                case "createnote": $this->createNote($authenticated); // authenticated stores the users ID at this point.
+                case "createnote":
+                    echo "creating note";
+                    $this->createNote($authenticated); // authenticated stores the users ID at this point.
+                    break;
+                case "getnotes":
+                    echo "getting notes";
+                    $this->getNotes($authenticated);
                     break;
             }
         }
         else{
             // return an error
+            echo "not authenticated!";
         }
 
 
@@ -58,6 +65,22 @@ class notepadapi
     }
 
 
+    // Return the notes of a user.
+    // This should be returned in an xml string.
+    // Parse this in javascript as an object!
+    private function getNotes($userID)
+    {
+        $xmlString = "<notes>";
+        foreach($this->getNotes($userID) as $note)
+        {
+            $xmlString.="\n<note>";
+            $xmlString.="\n".$note->getTitle();
+            $xmlString .= "\n</note>";
+        }
+        $xmlString .= "</note>";
+        echo $xmlString;
+    }
+
     private function authenticate()
     {
         $authKey = "";
@@ -69,9 +92,6 @@ class notepadapi
         {
             $authKey = $_POST['authkey'];
         }
-
-        // temp authkey = 1234;
-        // Get it form the database.
        $userID = $this->facade->authenticateKey($authKey);
        return $userID;
     }

@@ -20,6 +20,7 @@
     <link href="css/customcss.css" rel="stylesheet">
   <!--  <link href="css/cover.css" rel="stylesheet"> TRY THIS FOR A DARK  TEMPLATE -->
 
+    <script type="text/javascript" src="js/jquery.js"></script>
 
     <script type="text/javascript" src="js/notes.js"></script>
 
@@ -61,7 +62,7 @@
 
 
 
-</br></br></br>
+<br/><br/><br/>
 
     <!-- loop over the notifications -->
     <?php if($this->notifications != null){
@@ -74,31 +75,38 @@
     <?php if($this->errors != null){
         foreach($this->errors as $error){ ?>
             <p class="lead" style="color:red"><?php echo $error?></p>
-
         <?php }} ?>
 
-    <input type="button" class="btn btn-lg btn-primary btn-block" value="New note" onclick="newnotepopup()">
+    <input type="button" class="btn btn-lg btn-primary btn-block" value="New note" onclick="createNote()">
     <br/>
-    <div class="clearfix">
-        <label>Search: <input type="text" id="lookup" /></label>
-
+    <div class="clearfix" id="searchdiv">
+        <label>Search: <input type="text" id="filter" name="filter" /></label>
     </div>
     <br/>
         <div id="newnotediv">
             <form id="newnoteform" method="POST" action="index.php?action=createnote">
                 <label>Title: </label><input type="text" id="newnotetitle" name="newnotetitle"/>
                 <input type="submit" class="btn btn-default btn-primary" value="Create"/>
+                <button type="button" class="btn btn-default btn-primary" value="Cancel" onclick="hideNewNote()">Cancel</button>
             </form>
         </div>
 
     <div id="notelist">
-        <?php   if($this->notes != null){ foreach ($this->notes as $note) {
+        <?php   if($this->notes != null){ foreach ($this->notes as $note) { ?>
+            <br/>
+            <?php if(!$note->isShared()){
             ?>
+
             <a style="color:#<?php echo $note->getColour()?>" class="notelink" href=<?php echo "index.php?action=opennote&noteid=" . $note->getID()?>> <?php echo  $note->getTitle() ?></a>
             <a class="deletenote" href=<?php echo "index.php?action=deletenote&noteid=" . $note->getID()?>> x</a>
-            </br>
+            <?php } else{ ?>
+
+                <p><a style="color:#<?php echo $note->getColour()?>" class="notelink" href=<?php echo "index.php?action=opensharednote&noteid=" . $note->getID()?>> <?php echo  $note->getTitle() ?></a>
+                <?php if($_SESSION["user"]->getID() == $note->getUserID()){ ?><a class="deletenote" href=<?php echo "index.php?action=deletesharednote&noteid=" . $note->getID()?>> x</a></p><?php } ?>
+
+            <?php }?>
             <?php
-        }} ?>
+        }?>  <?php } ?>
     </div>
 
     <div class="mastfoot">
