@@ -138,7 +138,6 @@ class OnlineDB implements IDatabase
 
         foreach ($result as $row)
         {
-            if($row['ownerID'] != $userID) {
 
                 $note = new Note();
                 $note->setID($row['sharednoteID']);
@@ -156,7 +155,7 @@ class OnlineDB implements IDatabase
                 array_push($users, $user);
                 $note->setSharedUsers($users);
                 array_push($sharednotes, $note);
-            }
+
         }
         $this->closeConnection();
         return $sharednotes;

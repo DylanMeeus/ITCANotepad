@@ -5,6 +5,7 @@
 require_once "php/core/Facade.php";
 require_once "php/core/User.php";
 require_once "php/core/Note.php";
+require_once "php/validator/Validator.php";
 
 
 class Servlet
@@ -13,6 +14,7 @@ class Servlet
     private $facade;
     private $notes;
     private $note;
+    private $validator;
     private $openednotes;
     private $redirect;
     private $notelinks;
@@ -29,6 +31,7 @@ class Servlet
         $this->shared = false;
         $this->facade = new Facade();
         $this->openednotes = array();
+        $this->validator = new Validator();
     }
 
     public function processRequest()
@@ -162,9 +165,10 @@ class Servlet
             $nextPage = "notepage.php";
             $title = $_POST['newnotetitle'];
             $user = $_SESSION["user"];
-            if ($title === "")
+            if ($this->validator->sanitize($title) === "")
             {
                 array_push($this->errors, "Title can't be empty");
+                $this->notes = $this->facade->getNotes($user->getID());
                 $nextPage = 'notes.php';
             } else if (!$this->facade->isUniqueNotetitleForUser($user->getID(), $title))
             {
@@ -183,7 +187,7 @@ class Servlet
             $nextPage = "notepage.php";
             $title = $_POST['newnotetitle'];
             $user = $_SESSION["user"];
-            if ($title === "")
+            if ($this->validator->sanitize($title) === "")
             {
                 array_push($this->errors, "Title can't be empty");
                 $nextPage = $this->gotoSharedNotes();
@@ -262,7 +266,7 @@ class Servlet
             $nextPage = "register.php";
         } elseif ($action == "register")
         {
-            $username = $_POST['username'];
+            $username = $this->validator->sanitize($_POST['username']);
             $pass = $_POST['password'];
             $mail = "";
             if (isset($_POST['email']))
@@ -319,11 +323,9 @@ class Servlet
                     if ($shareduser->getUsername() == null)
                     {
                         array_push($this->errors, "User(s) not present in database");
-                        break;
                     } else if ($this->checkForDuplicateSharedUsers($shareduser, $alreadyAddedUsers))
                     {
                         array_push($this->errors, "Duplicate user forbidden");
-                        break;
                     } else
                     {
                         array_push($toAddusers, $shareduser);
@@ -335,7 +337,7 @@ class Servlet
                     $lastuser = true;
                 }
             }
-            if (empty($this->errors))
+            if (!empty($toAddusers))
             {
                 $this->facade->addSharedUsers($noteID, $toAddusers, $rightIds);
                 $this->note = $this->facade->getSharedNoteDetails($noteID);
