@@ -5,6 +5,7 @@
 require_once "php/core/Facade.php";
 require_once "php/core/User.php";
 require_once "php/core/Note.php";
+require_once "php/validator/Validator.php";
 
 
 class Servlet
@@ -16,6 +17,7 @@ class Servlet
     private $openednotes;
     private $redirect;
     private $notelinks;
+    private $validator;
     private $recoveryData;
     //true: shows extra partials needed for options for shared notes
     private $shared;
@@ -29,6 +31,7 @@ class Servlet
         $this->shared = false;
         $this->facade = new Facade();
         $this->openednotes = array();
+        $this->validator = new Validator();
     }
 
     public function processRequest()
@@ -162,7 +165,7 @@ class Servlet
             $nextPage = "notepage.php";
             $title = $_POST['newnotetitle'];
             $user = $_SESSION["user"];
-            if ($title === "")
+            if ($this->validator->sanitize($title) === "")
             {
                 array_push($this->errors, "Title can't be empty");
                 $nextPage = 'notes.php';
@@ -183,7 +186,7 @@ class Servlet
             $nextPage = "notepage.php";
             $title = $_POST['newnotetitle'];
             $user = $_SESSION["user"];
-            if ($title === "")
+            if ($this->validator->sanitize($title) === "")
             {
                 array_push($this->errors, "Title can't be empty");
                 $nextPage = $this->gotoSharedNotes();
@@ -262,7 +265,7 @@ class Servlet
             $nextPage = "register.php";
         } elseif ($action == "register")
         {
-            $username = $_POST['username'];
+            $username = $this->validator->sanitize($_POST['username']);
             $pass = $_POST['password'];
             $mail = "";
             if (isset($_POST['email']))
