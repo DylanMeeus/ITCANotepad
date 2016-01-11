@@ -36,9 +36,9 @@ function doBounce(element, times, distance, speed) {
 
 function setupSharedNotePage()
 {
+    getUsernames();
     setupPage();
     document.getElementById("adduserbutton").style.display = 'none';
-    getUsernames();
 }
 
 function setupPage()
@@ -49,7 +49,6 @@ function setupPage()
     });
 
     hideNewNote();
-
     $("#notelist").hide().fadeIn(1500);
     // apply fade-in to the other div?
 
