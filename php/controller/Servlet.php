@@ -338,7 +338,7 @@ class Servlet
                     $lastuser = true;
                 }
             }
-            if (empty($this->errors))
+            if (!empty($toAddusers))
             {
                 $this->facade->addSharedUsers($noteID, $toAddusers, $rightIds);
                 $this->note = $this->facade->getSharedNoteDetails($noteID);
