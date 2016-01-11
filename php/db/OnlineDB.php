@@ -687,6 +687,28 @@ class OnlineDB implements IDatabase
         return $unique;
     }
 
+    public function isNoteShared($noteID){
+        $this->openConnection();
+
+        $sql = "select userID from sharednotes where sharednoteID = ?";
+        $statement = $this->con->prepare($sql);
+        $statement->bindParam(1, $noteID);
+        $statement->execute();
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll();
+
+        $shared = false;
+        foreach ($result as $row)
+        {
+            if($row['userID'] != null){
+                $shared = true;
+            }
+            break;
+        }
+        $this->closeConnection();
+        return $shared;
+    }
+
     public function isUniqueNoteTitle($userID, $title)
     {
         $this->openConnection();

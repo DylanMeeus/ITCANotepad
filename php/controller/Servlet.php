@@ -105,6 +105,9 @@ class Servlet
 
             // does the note belong to this user?
             $user = $_SESSION["user"];
+            if($this->facade->isNoteShared($noteID)){
+                $this->shared = true;
+            }
 
             $this->note = $this->facade->getNoteDetails($noteID);
             if ($this->note->getUserID() == $user->getID())
