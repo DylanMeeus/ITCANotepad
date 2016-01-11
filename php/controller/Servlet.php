@@ -168,6 +168,7 @@ class Servlet
             if ($this->validator->sanitize($title) === "")
             {
                 array_push($this->errors, "Title can't be empty");
+                $this->notes = $this->facade->getNotes($user->getID());
                 $nextPage = 'notes.php';
             } else if (!$this->facade->isUniqueNotetitleForUser($user->getID(), $title))
             {
