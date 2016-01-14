@@ -83,7 +83,7 @@
     </div>
     <br/>
     <div id="newnotediv">
-        <form id="newnoteform" method="POST" action="index.php?action=createsharednote">
+        <form id="newnoteform" method="POST" onsubmit="createsharednote.disabled= true; return true;" action="index.php?action=createsharednote">
             <label>Title: </label><input type="text" id="newnotetitle" name="newnotetitle"/>
             <br/><br/>
             <div id="users">
@@ -92,7 +92,7 @@
             </div>
             <br/>
             <input type="button" class="btn btn-default btn-primary" value="Add user" onclick="addUserAtOverview()"/>
-            <input type="submit" id="adduser" class="btn btn-default btn-primary" value="Create"/>
+            <input type="submit" id="adduser" name="createsharednote" class="btn btn-default btn-primary" value="Create"/>
         </form>
 
 
