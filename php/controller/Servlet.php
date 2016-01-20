@@ -604,7 +604,7 @@ class Servlet
     {
         // We need to filter out some data fr
         $this->recoveryData = $_GET["recoveryid"];
-        echo "Data " . $this->recoveryData;
+
         return "passwordrecovery.php";
     }
 
@@ -616,7 +616,6 @@ class Servlet
             $inputPassword = $_POST['inputPassword'];
             $repeatPassword = $_POST['repeatPassword'];
             $recoveryString = $_POST['recoverydata'];
-            echo "input: " . $inputPassword . "repeat: " . $repeatPassword . " recovery: " . $recoveryString;
             if ($inputPassword == $repeatPassword)
             {
                 // Reset the users password. We can filter the recoveryString when we need to.
