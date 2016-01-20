@@ -84,9 +84,9 @@
     </div>
     <br/>
         <div id="newnotediv">
-            <form id="newnoteform" method="POST" action="index.php?action=createnote">
+            <form id="newnoteform" method="POST" onsubmit="createnote.disabled= true; return true;" action="index.php?action=createnote">
                 <label>Title: </label><input type="text" id="newnotetitle" name="newnotetitle"/>
-                <input type="submit" class="btn btn-default btn-primary" value="Create"/>
+                <input type="submit" name="createnote" class="btn btn-default btn-primary" value="Create"/>
                 <button type="button" class="btn btn-default btn-primary" value="Cancel" onclick="hideNewNote()">Cancel</button>
             </form>
         </div>

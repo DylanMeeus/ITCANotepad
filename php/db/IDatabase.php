@@ -33,6 +33,7 @@ interface IDatabase
     public function addAPIKey($userID, $key);
     public function getUsersAPIKey($userID);
     public function isUniqueUsername($username);
+    public function isNoteShared($noteID);
     public function createPasswordRecovery($mail, $recoveryString); // Generates the unique ID used to recover somebodies password.
 }
 ?>

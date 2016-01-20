@@ -30,7 +30,7 @@
     <![endif]-->
 </head>
 
-<body onload="setupPage()">
+<body onload="setupSharedNotePage()">
 
 
 <div class="container">
@@ -83,17 +83,16 @@
     </div>
     <br/>
     <div id="newnotediv">
-        <form id="newnoteform" method="POST" action="index.php?action=createsharednote">
+        <form id="newnoteform" method="POST" onsubmit="createsharednote.disabled= true; return true;" action="index.php?action=createsharednote">
             <label>Title: </label><input type="text" id="newnotetitle" name="newnotetitle"/>
             <br/><br/>
             <div id="users">
                 <label>Share with:</label>
                 <br/><br/>
-            </select>
             </div>
             <br/>
             <input type="button" class="btn btn-default btn-primary" value="Add user" onclick="addUserAtOverview()"/>
-            <input type="submit" id="adduser" class="btn btn-default btn-primary" value="Create"/>
+            <input type="submit" id="adduser" name="createsharednote" class="btn btn-default btn-primary" value="Create"/>
         </form>
 
 
@@ -105,7 +104,7 @@
             ?>
            <p><a style="color:#<?php echo $note->getColour()?>" class="notelink" href=<?php echo "index.php?action=opensharednote&noteid=" . $note->getID()?>> <?php echo  $note->getTitle() ?></a> Owner: <?php echo $note->getSharedUsers()[0]->getUsername() ?>
             <?php if($_SESSION["user"]->getID() == $note->getSharedUsers()[0]->getID()){ ?><a class="deletenote" href=<?php echo "index.php?action=deletesharednote&noteid=" . $note->getID()?>> x</a></p><?php } ?>
-            </br>
+            <br/>
             <?php
         }} ?>
     </div>

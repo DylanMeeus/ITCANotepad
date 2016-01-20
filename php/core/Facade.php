@@ -160,6 +160,10 @@ class Facade
         return $this->database->isUniqueNoteTitle($userID, $title);
     }
 
+    public function isNoteShared($noteID){
+        return $this->database->isNoteShared($noteID);
+    }
+
     public function makeShared($noteID, $userID){
         return $this->database->makeShared($noteID, $userID);
     }
